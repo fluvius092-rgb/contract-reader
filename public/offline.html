@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>オフライン — 契約書かんたん読み</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
+      background: #f9fafb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100svh;
+      padding: 24px;
+    }
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 40px 32px;
+      text-align: center;
+      max-width: 360px;
+      width: 100%;
+      box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    }
+    .icon { font-size: 48px; margin-bottom: 16px; }
+    h1 { font-size: 18px; font-weight: 700; color: #111827; margin-bottom: 8px; }
+    p  { font-size: 14px; color: #6b7280; line-height: 1.6; margin-bottom: 24px; }
+    button {
+      width: 100%;
+      padding: 14px;
+      background: #4f46e5;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:active { background: #4338ca; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">📵</div>
+    <h1>オフラインです</h1>
+    <p>
+      契約書の解析にはインターネット接続が必要です。<br>
+      Wi-FiまたはモバイルデータをONにしてから再試行してください。
+    </p>
+    <button onclick="location.reload()">再試行する</button>
+  </div>
+</body>
+</html>

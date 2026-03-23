@@ -1,0 +1,17 @@
+// storage.rules
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // tmp/ 配下はサーバー（Admin SDK）のみアクセス可
+    // クライアントからの直接アクセスは一切禁止
+    match /tmp/{userId}/{allPaths=**} {
+      allow read, write: if false;
+    }
+
+    // その他も全禁止
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
