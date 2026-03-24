@@ -15,11 +15,11 @@ android {
 
         // TWA のホストURL — Vercelデプロイ後に書き換えること
         manifestPlaceholders = [
-            hostName    : "contract-reader.vercel.app",
-            defaultUrl  : "https://contract-reader.vercel.app",
+            hostName    : "contract-reader-qv4c.vercel.app",
+            defaultUrl  : "https://contract-reader-qv4c.vercel.app",
             launcherName: "契約書かんたん読み",
             assetStatements: '[{ "relation": ["delegate_permission/common.handle_all_urls"], ' +
-                '"target": { "namespace": "web", "site": "https://contract-reader.vercel.app" } }]'
+                '"target": { "namespace": "web", "site": "https://contract-reader-qv4c.vercel.app" } }]'
         ]
     }
 

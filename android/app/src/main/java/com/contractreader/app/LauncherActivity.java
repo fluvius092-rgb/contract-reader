@@ -11,7 +11,7 @@ import androidx.browser.customtabs.CustomTabsIntent;
  */
 public class LauncherActivity extends AppCompatActivity {
 
-    private static final String DEFAULT_URL = "https://contract-reader.vercel.app";
+    private static final String DEFAULT_URL = "https://contract-reader-qv4c.vercel.app";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
