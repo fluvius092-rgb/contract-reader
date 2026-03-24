@@ -4,16 +4,16 @@ plugins {
 
 android {
     namespace 'com.contractreader.app'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.contractreader.app"
         minSdk 23
-        targetSdk 34
+        targetSdk 35
         versionCode 1
         versionName "1.0.0"
 
-        // TWA のホストURL — Vercelデプロイ後に書き換えること
+        // TWA のホストURL
         manifestPlaceholders = [
             hostName    : "contract-reader-qv4c.vercel.app",
             defaultUrl  : "https://contract-reader-qv4c.vercel.app",
@@ -25,19 +25,18 @@ android {
 
     signingConfigs {
         release {
-            // キーストア生成後に設定する（下記の手順参照）
-            // storeFile file('keystore/release.keystore')
-            // storePassword 'YOUR_STORE_PASSWORD'
-            // keyAlias 'contractreader'
-            // keyPassword 'YOUR_KEY_PASSWORD'
+            storeFile file('keystore/release.keystore')
+            storePassword 'contract123'
+            keyAlias 'contractreader'
+            keyPassword 'contract123'
         }
     }
 
     buildTypes {
         release {
             minifyEnabled true
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
-            // signingConfig signingConfigs.release  // キーストア設定後にアンコメント
         }
     }
 
@@ -49,4 +48,5 @@ android {
 
 dependencies {
     implementation 'androidx.browser:browser:1.8.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
 }
