@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="${launcherName}"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.ContractReader">
+
+        <!-- TWA メインActivity -->
+        <activity
+            android:name="com.contractreader.app.LauncherActivity"
+            android:exported="true"
+            android:theme="@style/Theme.ContractReader.Launch">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- PWA URL を処理 -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="${hostName}" />
+            </intent-filter>
+        </activity>
+
+        <!-- Digital Asset Links の宣言 -->
+        <meta-data
+            android:name="asset_statements"
+            android:value="${assetStatements}" />
+
+    </application>
+
+</manifest>

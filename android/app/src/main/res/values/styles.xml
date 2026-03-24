@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- アプリのベーステーマ -->
+    <style name="Theme.ContractReader" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:statusBarColor">#4f46e5</item>
+        <item name="android:navigationBarColor">#ffffff</item>
+    </style>
+
+    <!-- スプラッシュ画面用テーマ -->
+    <style name="Theme.ContractReader.Launch" parent="Theme.ContractReader">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+    </style>
+</resources>

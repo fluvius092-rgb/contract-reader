@@ -27,6 +27,7 @@ export function useAnalyze() {
         const uploadRes = await fetch('/api/upload', {
           method: 'POST',
           body: formData,
+          signal: AbortSignal.timeout(30_000), // 30秒タイムアウト
         })
 
         if (!uploadRes.ok) {
@@ -43,6 +44,7 @@ export function useAnalyze() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ category, storageRef, mimeType, userQuestion }),
+          signal: AbortSignal.timeout(65_000), // 65秒タイムアウト（サーバー側60秒+余裕）
         })
 
         if (!analyzeRes.ok) {
@@ -55,7 +57,16 @@ export function useAnalyze() {
         setState(s => ({ ...s, status: 'done', result }))
 
       } catch (err) {
-        const message = err instanceof Error ? err.message : '予期しないエラーが発生しました'
+        let message: string
+
+        if (err instanceof DOMException && err.name === 'TimeoutError') {
+          message = '通信がタイムアウトしました。ネットワーク環境を確認して再試行してください。'
+        } else if (err instanceof TypeError && err.message === 'Failed to fetch') {
+          message = 'サーバーに接続できません。ネットワーク環境を確認してください。'
+        } else {
+          message = err instanceof Error ? err.message : '予期しないエラーが発生しました'
+        }
+
         setState(s => ({ ...s, status: 'error', error: message }))
       }
     },

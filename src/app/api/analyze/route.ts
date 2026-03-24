@@ -147,8 +147,32 @@ export async function POST(req: NextRequest) {
 
   } catch (err) {
     console.error('[analyze] error:', err)
-    const message =
-      err instanceof Error ? err.message : '解析中にエラーが発生しました'
-    return NextResponse.json({ error: message }, { status: 500 })
+
+    // エラー種別に応じたユーザー向けメッセージ
+    const errMsg = err instanceof Error ? err.message : String(err)
+    const status = (err as { status?: number })?.status
+
+    let userMessage: string
+    let httpStatus = 500
+
+    if (errMsg.includes('Firebase Admin') || errMsg.includes('環境変数')) {
+      userMessage = 'サーバーの設定に問題があります。管理者に連絡してください。'
+      httpStatus = 503
+    } else if (status === 529 || errMsg.toLowerCase().includes('overloaded')) {
+      userMessage = 'AIサーバーが混み合っています。しばらく待ってから再試行してください。'
+      httpStatus = 503
+    } else if (errMsg.toLowerCase().includes('timeout')) {
+      userMessage = '解析に時間がかかりすぎました。ファイルサイズを小さくするか、再試行してください。'
+      httpStatus = 504
+    } else if (status === 401 || errMsg.toLowerCase().includes('api key')) {
+      userMessage = 'AI APIの認証に失敗しました。管理者に連絡してください。'
+      httpStatus = 503
+    } else if (errMsg.includes('JSON') || errMsg.includes('パース') || errMsg.includes('解析できません')) {
+      userMessage = 'AIの出力を解析できませんでした。再試行してください。'
+    } else {
+      userMessage = '解析中にエラーが発生しました。再試行してください。'
+    }
+
+    return NextResponse.json({ error: userMessage }, { status: httpStatus })
   }
 }

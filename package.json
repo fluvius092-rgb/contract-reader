@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "deploy:rules": "firebase deploy --only firestore:rules,storage",
+    "deploy:vercel": "vercel --prod",
+    "generate-icons": "node scripts/generate-icons.mjs"
   },
   "dependencies": {
     "next": "14.2.5",

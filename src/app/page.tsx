@@ -5,6 +5,7 @@ import { useAnalyze } from '@/lib/hooks/useAnalyze'
 import { UploadZone } from '@/components/features/UploadZone'
 import { AnalysisResultView } from '@/components/features/AnalysisResult'
 import { AnalyzingState } from '@/components/features/AnalyzingState'
+import { AdBanner } from '@/components/ui/AdBanner'
 
 export default function HomePage() {
   const { state, analyze, reset } = useAnalyze()
@@ -79,9 +80,11 @@ export default function HomePage() {
 
         {/* 広告枠（結果表示時） */}
         {state.status === 'done' && (
-          <div className="mt-4 bg-gray-100 rounded-xl p-4 text-center text-xs text-gray-400 border border-dashed border-gray-300">
-            広告スペース（引越し・乗り換え・保険比較）
-          </div>
+          <AdBanner
+            slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_RESULT ?? ''}
+            format="auto"
+            className="mt-4"
+          />
         )}
 
       </main>

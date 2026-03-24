@@ -73,9 +73,18 @@ export async function POST(req: NextRequest) {
 
   } catch (err) {
     console.error('[upload] error:', err)
-    return NextResponse.json(
-      { error: 'アップロードに失敗しました' },
-      { status: 500 }
-    )
+
+    const errMsg = err instanceof Error ? err.message : String(err)
+    let userMessage = 'アップロードに失敗しました。再試行してください。'
+    let httpStatus = 500
+
+    if (errMsg.includes('Firebase Admin') || errMsg.includes('環境変数')) {
+      userMessage = 'サーバーの設定に問題があります。管理者に連絡してください。'
+      httpStatus = 503
+    } else if (errMsg.toLowerCase().includes('storage')) {
+      userMessage = 'ファイル保存に失敗しました。再試行してください。'
+    }
+
+    return NextResponse.json({ error: userMessage }, { status: httpStatus })
   }
 }
