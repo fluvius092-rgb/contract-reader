@@ -31,13 +31,17 @@ export default function RootLayout({
       <head>
         {/* PWA: Apple Touch Icon */}
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
-        {/* AdSense */}
+        {/* AdSense 審査用 meta タグ */}
+        {process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID && (
+          <meta name="google-adsense-account" content={process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID} />
+        )}
+        {/* AdSense — beforeInteractive でHTMLに直接出力（クローラー検出用） */}
         {process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID && (
           <Script
             async
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID}`}
             crossOrigin="anonymous"
-            strategy="afterInteractive"
+            strategy="beforeInteractive"
           />
         )}
       </head>
