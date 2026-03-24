@@ -44,13 +44,27 @@ export default function HomePage() {
                 isLoading={false}
               />
             </div>
+            {/* トップページ下部の広告 */}
+            <AdBanner
+              slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_TOP ?? ''}
+              format="horizontal"
+              className="mt-2"
+            />
           </div>
         )}
 
         {/* ローディング */}
         {(state.status === 'uploading' || state.status === 'analyzing') && (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
-            <AnalyzingState status={state.status} />
+          <div className="space-y-4">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
+              <AnalyzingState status={state.status} />
+            </div>
+            {/* 解析中の広告 */}
+            <AdBanner
+              slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_ANALYZING ?? ''}
+              format="rectangle"
+              className="mt-2"
+            />
           </div>
         )}
 
