@@ -53,9 +53,24 @@ export default function PrivacyPage() {
             <ul className="list-disc pl-5 space-y-1 mt-2">
               <li><strong>Anthropic（Claude API）</strong>: 契約書テキストをAI解析のために送信します。Anthropicのプライバシーポリシーに従い処理されます。</li>
               <li><strong>Firebase（Google）</strong>: 認証、データベース、ファイルストレージに利用します。</li>
-              <li><strong>Google AdSense</strong>: 広告の配信に利用します。Cookieを使用する場合があります。</li>
+              <li><strong>Google AdSense</strong>: 広告の配信に利用します。詳細は下記「広告配信について」をご参照ください。</li>
             </ul>
             <p className="mt-2">上記以外の第三者に個人情報を提供することはありません。</p>
+          </section>
+
+          <section>
+            <h2 className="text-base font-bold text-gray-900 mb-2">3-2. 広告配信について（Google AdSense）</h2>
+            <p>
+              本サービスではGoogle AdSenseを利用して広告を配信しています。
+              Google AdSenseはユーザーの興味に基づいた広告を表示するために、
+              Cookie（クッキー）を使用することがあります。
+            </p>
+            <ul className="list-disc pl-5 space-y-1 mt-2">
+              <li>Googleは、ユーザーがアクセスしたウェブサイトの情報に基づいて広告を配信します。</li>
+              <li>ユーザーはGoogleの<a href="https://www.google.com/settings/ads" className="text-indigo-600 underline" target="_blank" rel="noopener noreferrer">広告設定ページ</a>で、パーソナライズ広告を無効にすることができます。</li>
+              <li>また、<a href="https://www.aboutads.info/choices/" className="text-indigo-600 underline" target="_blank" rel="noopener noreferrer">www.aboutads.info</a>にアクセスすることで、第三者配信事業者によるCookieの利用を無効にすることができます。</li>
+              <li>Googleのプライバシーポリシーの詳細は<a href="https://policies.google.com/privacy" className="text-indigo-600 underline" target="_blank" rel="noopener noreferrer">Google プライバシーポリシー</a>をご確認ください。</li>
+            </ul>
           </section>
 
           <section>
@@ -105,6 +120,19 @@ export default function PrivacyPage() {
           </p>
         </div>
       </main>
+
+      <footer className="border-t border-gray-200 mt-8">
+        <div className="max-w-2xl mx-auto px-4 py-6 text-center space-y-3">
+          <nav className="flex flex-wrap justify-center gap-4 text-xs text-gray-500">
+            <a href="/" className="hover:text-gray-700">ホーム</a>
+            <a href="/about" className="hover:text-gray-700">サービスについて</a>
+            <a href="/terms" className="hover:text-gray-700">利用規約</a>
+            <a href="/privacy" className="hover:text-gray-700">プライバシーポリシー</a>
+            <a href="/contact" className="hover:text-gray-700">お問い合わせ</a>
+          </nav>
+          <p className="text-xs text-gray-400">© 2025 契約書かんたん読み</p>
+        </div>
+      </footer>
     </div>
   )
 }
