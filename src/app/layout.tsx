@@ -7,7 +7,7 @@ import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
-const APP_URL = 'https://contract-reader-qv4c.vercel.app'
+const APP_URL = 'https://settlabs.app/contract_reader'
 
 export const metadata: Metadata = {
   title: '契約書かんたん読み — むずかしい契約書をわかりやすく',
@@ -45,8 +45,8 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <head>
-        {/* PWA: Apple Touch Icon */}
-        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+        {/* PWA: Apple Touch Icon (basePath 込みのパスを明示) */}
+        <link rel="apple-touch-icon" href="/contract_reader/icons/icon-192.png" />
         {/* AdSense 審査用 meta タグ */}
         {process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID && (
           <meta name="google-adsense-account" content={process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID} />

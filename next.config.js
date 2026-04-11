@@ -12,6 +12,7 @@ const withPWA = require('@ducanh2912/next-pwa').default({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  basePath: '/contract_reader',
   serverExternalPackages: ['pdf-parse', 'tesseract.js', 'sharp'],
   // .well-known/assetlinks.json を静的ファイルとして配信
   async headers() {
