@@ -2,7 +2,7 @@
 // ファイルをFirebase Storageにアップロードするエンドポイント
 
 import { NextRequest, NextResponse } from 'next/server'
-import { adminStorage } from '@/lib/firebase-admin'
+import { adminStorage, verifyIdToken } from '@/lib/firebase-admin'
 import { randomUUID } from 'crypto'
 
 const ALLOWED_MIME_TYPES = [
@@ -17,9 +17,11 @@ const MAX_FILE_SIZE = 20 * 1024 * 1024 // 20MB
 
 export async function POST(req: NextRequest) {
   try {
-    const formData  = await req.formData()
-    const file      = formData.get('file') as File | null
-    const userId    = formData.get('userId') as string | null
+    // 認証トークン検証（任意 — 匿名ユーザーも利用可）
+    const userId = await verifyIdToken(req)
+
+    const formData = await req.formData()
+    const file     = formData.get('file') as File | null
 
     if (!file) {
       return NextResponse.json(
@@ -45,6 +47,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Storage パス（解析後に削除するので tmp/ 配下）
+    // uid はトークンから取得（クライアント送信値は使わない）
     const ext        = file.type === 'application/pdf' ? 'pdf' : 'img'
     const uid        = userId ?? 'anonymous'
     const storageRef = `tmp/${uid}/${randomUUID()}.${ext}`

@@ -7,10 +7,12 @@ import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
+const APP_URL = 'https://contract-reader-qv4c.vercel.app'
+
 export const metadata: Metadata = {
   title: '契約書かんたん読み — むずかしい契約書をわかりやすく',
-  description: '不動産・携帯・保険・ローン・雇用の契約書をAIが読み解きます。無料で使えます。',
-  keywords: ['契約書', '賃貸', '携帯', '保険', 'ローン', '雇用', 'AI', '読み解き'],
+  description: '不動産・携帯・保険・ローン・雇用の契約書をAIが読み解きます。PDF・画像をアップロードするだけ。無料・登録不要。',
+  keywords: ['契約書', '賃貸', '携帯', '保険', 'ローン', '雇用', 'AI', '読み解き', '無料', 'PDF', 'OCR'],
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -19,6 +21,20 @@ export const metadata: Metadata = {
   },
   formatDetection: { telephone: false },
   themeColor: '#4f46e5',
+  openGraph: {
+    type: 'website',
+    url: APP_URL,
+    title: '契約書かんたん読み — むずかしい契約書をわかりやすく',
+    description: '不動産・携帯・保険・ローン・雇用の契約書をAIが読み解きます。PDF・画像をアップロードするだけ。無料・登録不要。',
+    siteName: '契約書かんたん読み',
+    images: [{ url: `${APP_URL}/icons/icon-512.png`, width: 512, height: 512 }],
+  },
+  twitter: {
+    card: 'summary',
+    title: '契約書かんたん読み',
+    description: '契約書をAIがわかりやすく解説。無料・登録不要。',
+    images: [`${APP_URL}/icons/icon-512.png`],
+  },
 }
 
 export default function RootLayout({

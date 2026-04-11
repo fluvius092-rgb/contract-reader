@@ -30,7 +30,10 @@ function WarningItem({ warning }: { warning: Warning }) {
 }
 
 // ── キーナンバー表示 ──────────────────────────────────
-function KeyNumbers({ numbers }: { numbers: Record<string, string> }) {
+// KeyNumbers の各バリアントはすべて { [key: string]: string } の構造を持つ
+// TypeScript はユニオン型のインデックスシグネチャを推論できないため、unknown 経由でキャスト
+function KeyNumbers({ numbers }: { numbers: import('@/types').KeyNumbers }) {
+  const entries = Object.entries(numbers as unknown as Record<string, string>)
   const labels: Record<string, string> = {
     // 不動産
     rent: '家賃', deposit: '敷金/礼金', contract_period: '契約期間',
@@ -52,7 +55,7 @@ function KeyNumbers({ numbers }: { numbers: Record<string, string> }) {
 
   return (
     <div className="bg-gray-50 rounded-xl overflow-hidden">
-      {Object.entries(numbers).map(([key, value]) => (
+      {entries.map(([key, value]) => (
         <div
           key={key}
           className="flex items-baseline justify-between px-3 py-2 border-b border-gray-100 last:border-0 text-sm"
@@ -104,7 +107,7 @@ export function AnalysisResultView({ result, onReset }: Props) {
         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
           重要な数字・日付
         </h3>
-        <KeyNumbers numbers={result.key_numbers as unknown as Record<string, string>} />
+        <KeyNumbers numbers={result.key_numbers} />
       </section>
 
       {/* 要点まとめ */}

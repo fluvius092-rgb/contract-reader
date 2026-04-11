@@ -2,6 +2,7 @@
 // アップロード → 解析の一連フローを管理するカスタムフック
 
 import { useState, useCallback } from 'react'
+import { auth } from '@/lib/firebase'
 import type { CategoryId, AnalysisResult, UploadState } from '@/types'
 
 export function useAnalyze() {
@@ -18,14 +19,19 @@ export function useAnalyze() {
       setState({ status: 'uploading', file, category, result: null, error: null })
 
       try {
+        // 認証済みユーザーの ID トークンを取得（匿名の場合は空）
+        const idToken = await auth.currentUser?.getIdToken() ?? null
+        const authHeaders: Record<string, string> = idToken
+          ? { Authorization: `Bearer ${idToken}` }
+          : {}
+
         // ── Step 1: ファイルをアップロード ──────────────
         const formData = new FormData()
         formData.append('file', file)
-        // userId があれば追加（認証実装後）
-        // formData.append('userId', uid)
 
         const uploadRes = await fetch('/api/upload', {
           method: 'POST',
+          headers: authHeaders,
           body: formData,
           signal: AbortSignal.timeout(30_000), // 30秒タイムアウト
         })
@@ -42,7 +48,7 @@ export function useAnalyze() {
 
         const analyzeRes = await fetch('/api/analyze', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', ...authHeaders },
           body: JSON.stringify({ category, storageRef, mimeType, userQuestion }),
           signal: AbortSignal.timeout(65_000), // 65秒タイムアウト（サーバー側60秒+余裕）
         })

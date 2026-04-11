@@ -26,6 +26,7 @@ export default function HistoryPage() {
   const [items, setItems]     = useState<HistoryItem[]>([])
   const [loading, setLoading] = useState(true)
   const [userId, setUserId]   = useState<string | null>(null)
+  const [error, setError]     = useState<string | null>(null)
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, user => {
@@ -38,14 +39,27 @@ export default function HistoryPage() {
     if (!userId) { setLoading(false); return }
 
     const load = async () => {
-      const q = query(
-        collection(db, 'users', userId, 'analyses'),
-        orderBy('createdAt', 'desc'),
-        limit(30)
-      )
-      const snap = await getDocs(q)
-      setItems(snap.docs.map(d => ({ id: d.id, ...d.data() } as HistoryItem)))
-      setLoading(false)
+      try {
+        const q = query(
+          collection(db, 'users', userId, 'analyses'),
+          orderBy('createdAt', 'desc'),
+          limit(30)
+        )
+        const snap = await getDocs(q)
+        setItems(snap.docs.map(d => {
+          const data = d.data()
+          // Firestore Timestamp を { seconds } 形式に正規化
+          const createdAt = data.createdAt?.seconds != null
+            ? { seconds: data.createdAt.seconds }
+            : { seconds: Math.floor(Date.now() / 1000) }
+          return { id: d.id, ...data, createdAt } as HistoryItem
+        }))
+      } catch (err) {
+        console.error('[history] Firestore query failed:', err)
+        setError('履歴の読み込みに失敗しました。再読み込みしてください。')
+      } finally {
+        setLoading(false)
+      }
     }
     load()
   }, [userId])
@@ -62,6 +76,12 @@ export default function HistoryPage() {
       <main className="max-w-lg mx-auto px-4 py-6">
         {loading && (
           <div className="text-center py-16 text-gray-400">読み込み中...</div>
+        )}
+
+        {!loading && error && (
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-5 text-center">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
         )}
 
         {!loading && !userId && (

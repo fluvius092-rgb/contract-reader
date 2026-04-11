@@ -6,19 +6,24 @@ import Anthropic from '@anthropic-ai/sdk'
 import { z } from 'zod'
 import { extractText, validateExtractedText } from '@/lib/extract'
 import { getSystemPrompt, buildUserMessage } from '@/lib/prompts'
-import { adminStorage, adminDb } from '@/lib/firebase-admin'
+import { adminStorage, adminDb, verifyIdToken } from '@/lib/firebase-admin'
 import { checkRateLimit } from '@/lib/rateLimit'
 import type { CategoryId, AnalysisResult } from '@/types'
+
+// storageRef は tmp/{uid}/{uuid}.pdf または tmp/{uid}/{uuid}.img のみ許可
+// パストラバーサル攻撃（../）を防ぐ
+const STORAGE_REF_PATTERN = /^tmp\/[a-zA-Z0-9]+\/[0-9a-f-]+\.(pdf|img)$/
 
 // ── バリデーション ────────────────────────────────────
 const RequestSchema = z.object({
   category: z.enum([
     'real_estate', 'mobile', 'insurance', 'loan', 'employment',
   ]),
-  storageRef: z.string().min(1), // Firebase Storage のパス
-  mimeType: z.string().min(1),
-  userQuestion: z.string().optional(),
-  userId: z.string().optional(),
+  storageRef: z.string().regex(STORAGE_REF_PATTERN, 'storageRef の形式が不正です'),
+  mimeType: z.enum([
+    'application/pdf', 'image/jpeg', 'image/png', 'image/webp', 'image/heic',
+  ]),
+  userQuestion: z.string().max(500).optional(),
 })
 
 // ── Anthropic クライアント ─────────────────────────────
@@ -64,28 +69,45 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // 1. リクエストのバリデーション
-    const body = await req.json()
+    // 1. 認証トークン検証（任意 — 匿名ユーザーも利用可）
+    const userId = await verifyIdToken(req)
+
+    // 2. リクエストのバリデーション
+    let body: unknown
+    try {
+      body = await req.json()
+    } catch {
+      return NextResponse.json({ error: 'リクエストの形式が正しくありません' }, { status: 400 })
+    }
     const parsed = RequestSchema.safeParse(body)
     if (!parsed.success) {
       return NextResponse.json(
-        { error: 'リクエストの形式が正しくありません', details: parsed.error.issues },
+        { error: 'リクエストの形式が正しくありません' }, // details は外部に返さない
         { status: 400 }
       )
     }
 
-    const { category, storageRef, mimeType, userQuestion, userId } =
-      parsed.data
+    const { category, storageRef, mimeType, userQuestion } = parsed.data
 
-    // 2. Firebase Storage からファイルを取得
+    // 3. storageRef が認証済みユーザーのパスと一致することを確認
+    // 例: tmp/anonymous/xxx.pdf または tmp/{userId}/xxx.pdf
+    const expectedPrefix = `tmp/${userId ?? 'anonymous'}/`
+    if (!storageRef.startsWith(expectedPrefix)) {
+      return NextResponse.json(
+        { error: '不正なファイルパスです' },
+        { status: 403 }
+      )
+    }
+
+    // 4. Firebase Storage からファイルを取得
     const bucket = adminStorage.bucket()
     const file = bucket.file(storageRef)
     const [fileBuffer] = await file.download()
 
-    // 3. テキスト抽出
+    // 5. テキスト抽出
     const extractedText = await extractText(fileBuffer, mimeType)
 
-    // 4. 抽出結果のバリデーション
+    // 6. 抽出結果のバリデーション
     const validation = validateExtractedText(extractedText)
     if (!validation.valid) {
       // ファイルを即削除
@@ -96,7 +118,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // 5. Claude API 呼び出し（タイムアウト時リトライあり）
+    // 7. Claude API 呼び出し（タイムアウト時リトライあり）
     const systemPrompt  = getSystemPrompt(category as CategoryId)
     const userMessage   = buildUserMessage(extractedText, category as CategoryId, userQuestion)
 
@@ -107,7 +129,7 @@ export async function POST(req: NextRequest) {
       messages: [{ role: 'user', content: userMessage }],
     })
 
-    // 6. レスポンスをパース
+    // 8. レスポンスをパース
     const rawContent = message.content[0]
     if (rawContent.type !== 'text') {
       throw new Error('Claude から予期しない形式のレスポンスが返されました')
@@ -125,23 +147,23 @@ export async function POST(req: NextRequest) {
       throw new Error('AI の出力を解析できませんでした。再試行してください。')
     }
 
-    // 7. Firestore に結果を保存（任意 — 履歴機能用）
+    // 9. Firestore に結果を保存（任意 — 履歴機能用、認証済みユーザーのみ）
     // 保存失敗しても解析結果は返す（フォールバック）
     if (userId) {
-      await adminDb
+      adminDb
         .collection('users')
         .doc(userId)
         .collection('analyses')
         .add({
           ...result,
           createdAt: new Date(),
-          storageRef,
+          // storageRef は削除済みなので保存不要
         })
-        .catch(e => console.error('[analyze] Firestore save failed:', e))
+        .catch((e: unknown) => console.error('[analyze] Firestore save failed:', e))
     }
 
-    // 8. ファイルを即削除（プライバシー保護）
-    await file.delete().catch(console.error)
+    // 10. ファイルを即削除（プライバシー保護）
+    await file.delete().catch((e: unknown) => console.error('[analyze] Storage delete failed:', e))
 
     return NextResponse.json({ result })
 

@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 
+export const dynamic = 'force-static'
+
 export const metadata: Metadata = {
   title: 'お問い合わせ — 契約書かんたん読み',
   description: '契約書かんたん読みへのお問い合わせ・ご意見はこちらから。',
