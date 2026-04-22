@@ -1,6 +1,9 @@
 // src/types/index.ts
 
-export type CategoryId = 'real_estate' | 'mobile' | 'insurance' | 'loan' | 'employment'
+import { type z } from 'zod'
+import { type AnalysisResultSchema } from '@/lib/analysisSchema'
+
+export type CategoryId = 'real_estate' | 'moving' | 'mobile' | 'insurance' | 'loan' | 'employment' | 'other'
 
 export interface Category {
   id: CategoryId
@@ -11,10 +14,12 @@ export interface Category {
 
 export const CATEGORIES: Category[] = [
   { id: 'real_estate', label: '不動産',       emoji: '🏠', color: '#4a9eff' },
+  { id: 'moving',      label: '引越し',        emoji: '🚚', color: '#f97316' },
   { id: 'mobile',      label: '携帯・通信',    emoji: '📱', color: '#3ecf8e' },
   { id: 'insurance',   label: '保険',          emoji: '🛡', color: '#f5a623' },
   { id: 'loan',        label: 'ローン・クレカ', emoji: '💳', color: '#e05c7c' },
   { id: 'employment',  label: '雇用・業務委託', emoji: '💼', color: '#a78bfa' },
+  { id: 'other',       label: 'その他',         emoji: '📝', color: '#6b7280' },
 ]
 
 // ── Warning ──────────────────────────────────────────
@@ -70,40 +75,34 @@ export interface EmploymentNumbers {
   notice_period: string
 }
 
+export interface MovingNumbers {
+  total_price: string
+  work_date: string
+  cancel_fee: string
+  liability_limit: string
+  payment_timing: string
+}
+
 export type KeyNumbers =
   | RealEstateNumbers
+  | MovingNumbers
   | MobileNumbers
   | InsuranceNumbers
   | LoanNumbers
   | EmploymentNumbers
 
 // ── Analysis Result ───────────────────────────────────
-export interface AnalysisResult {
-  doc_type: string
-  category: CategoryId
-  key_numbers: KeyNumbers
-  summary: string[]
-  warnings: Warning[]
-  terms: Term[]
-  // category-specific extras
-  tenant_checklist?: string[]       // real_estate
-  cancel_guide?: {                  // mobile
-    free_cancel_window: string
-    steps: string[]
-  }
-  coverage?: {                      // insurance
-    covered: string[]
-    not_covered: string[]
-  }
-}
+export type AnalysisResult = z.infer<typeof AnalysisResultSchema>
 
 // ── Upload State ──────────────────────────────────────
 export type UploadStatus = 'idle' | 'uploading' | 'analyzing' | 'done' | 'error'
 
 export interface UploadState {
-  status: UploadStatus
-  file: File | null
-  category: CategoryId | null
-  result: AnalysisResult | null
-  error: string | null
+  status:             UploadStatus
+  file:               File | null
+  category:           CategoryId | null
+  result:             AnalysisResult | null
+  error:              string | null
+  planRequired:       boolean
+  serviceUnavailable: boolean
 }

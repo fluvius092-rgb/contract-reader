@@ -42,8 +42,8 @@ interface PlanLimit {
 }
 
 const PLAN_LIMITS: Record<Plan, PlanLimit> = {
-  anonymous: { analyses: 1,  pages: 1,  window: 'day'   },
-  free:      { analyses: 3,  pages: 1,  window: 'month' },
+  anonymous: { analyses: 1,  pages: 10, window: 'month' },
+  free:      { analyses: 1,  pages: 20, window: 'month' },
   one_time:  { analyses: 1,  pages: 60, window: 'month' },  // 1クレジット = 1回
   sub_light: { analyses: 3,  pages: 20, window: 'month' },
   sub_std:   { analyses: 5,  pages: 20, window: 'month' },
@@ -65,13 +65,10 @@ function thisMonthJST(): string {
   }).replace(/\//g, '-')
 }
 
-function buildKey(plan: Plan, ip: string, uid: string | null): string {
-  if (plan === 'anonymous') return `ip_${ip}_${todayJST()}`
-  // サブスク・都度課金は月次キー、無料は日次キー
-  if (plan === 'sub_std' || plan === 'sub_light' || plan === 'one_time') {
-    return `uid_${uid}_${thisMonthJST()}`
-  }
-  return `uid_${uid}_${todayJST()}`
+export function buildKey(plan: Plan, ip: string, uid: string | null): string {
+  if (plan === 'anonymous') return `ip_${ip}_${thisMonthJST()}`
+  // free 含む全プランで月次キー
+  return `uid_${uid}_${thisMonthJST()}`
 }
 
 export async function getUserPlan(
@@ -101,28 +98,33 @@ export function getPlanLimit(plan: Plan): PlanLimit {
 export async function checkDailyLimit(
   ip: string,
   uid: string | null,
-): Promise<{ ok: boolean; plan: Plan; remaining: number; retryAfter?: string; maxPages: number }> {
+): Promise<{
+  ok: boolean
+  plan: Plan
+  remaining: number
+  retryAfter?: string
+  maxPages: number
+  commit: () => Promise<void>
+}> {
+  const noop: () => Promise<void> = () => Promise.resolve()
   const { plan, oneTimeCredits } = await getUserPlan(uid)
   const limit = PLAN_LIMITS[plan]
 
-  // 都度課金: クレジットをトランザクションで減算
+  // 都度課金: 上限チェックのみ（減算は commit で行う）
   if (plan === 'one_time' && uid) {
-    const ref = adminDb.collection('users').doc(uid)
-    try {
+    const userRef = adminDb.collection('users').doc(uid)
+    const commit = async () => {
       await adminDb.runTransaction(async tx => {
-        const snap = await tx.get(ref)
+        const snap = await tx.get(userRef)
         const cur = (snap.data()?.oneTimeCredits as number | undefined) ?? 0
         if (cur <= 0) throw new Error('NO_CREDIT')
-        tx.update(ref, { oneTimeCredits: cur - 1, updatedAt: new Date() })
+        tx.update(userRef, { oneTimeCredits: cur - 1, updatedAt: new Date() })
       })
-      return { ok: true, plan, remaining: oneTimeCredits - 1, maxPages: limit.pages }
-    } catch {
-      // クレジット枯渇 → free として再評価
-      return checkDailyLimit(ip, uid)
     }
+    return { ok: true, plan, remaining: oneTimeCredits - 1, maxPages: limit.pages, commit }
   }
 
-  // 既存の日次/月次カウンターロジック
+  // 通常プラン: カウント確認のみ（増加は commit で行う）
   const key  = buildKey(plan, ip, uid)
   const ref  = adminDb.collection('rateLimits').doc(key)
   const snap = await ref.get()
@@ -130,11 +132,13 @@ export async function checkDailyLimit(
 
   if (count >= limit.analyses) {
     const retryAfter = limit.window === 'day' ? '明日0時（JST）' : '来月1日'
-    return { ok: false, plan, remaining: 0, retryAfter, maxPages: limit.pages }
+    return { ok: false, plan, remaining: 0, retryAfter, maxPages: limit.pages, commit: noop }
   }
 
-  await ref.set({ count: count + 1 }, { merge: true })
-  return { ok: true, plan, remaining: limit.analyses - count - 1, maxPages: limit.pages }
+  const commit = async () => {
+    await ref.set({ count: count + 1 }, { merge: true })
+  }
+  return { ok: true, plan, remaining: limit.analyses - count - 1, maxPages: limit.pages, commit }
 }
 
 // ── 後方互換エクスポート（既存 route.ts が import している場合用）──

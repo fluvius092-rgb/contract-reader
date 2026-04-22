@@ -2,13 +2,17 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { FieldValue } from 'firebase-admin/firestore'
-import { stripe } from '@/lib/stripe'
+import { stripe, validateStripeConfig } from '@/lib/stripe'
 import { adminDb } from '@/lib/firebase-admin'
 import type Stripe from 'stripe'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
+const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000
+
+// NOTE: 新規 checkout は subscription_data.metadata.userId を必ず設定する。
+// 以下の customer 逆引きは旧実装（metadata 未設定）互換フォールバック。
 async function resolveUserId(sub: Stripe.Subscription): Promise<string | undefined> {
   if (sub.metadata?.userId) return sub.metadata.userId
   const q = await adminDb.collection('users')
@@ -18,28 +22,37 @@ async function resolveUserId(sub: Stripe.Subscription): Promise<string | undefin
 }
 
 export async function POST(req: NextRequest) {
+  const secret = process.env.STRIPE_WEBHOOK_SECRET
+  if (!secret) {
+    console.error('[webhook] STRIPE_WEBHOOK_SECRET 未設定')
+    return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 500 })
+  }
+
+  try { validateStripeConfig() } catch (err) {
+    console.error('[webhook] config error:', err)
+    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
+  }
+
   const body      = await req.text()
   const signature = req.headers.get('stripe-signature') ?? ''
 
   let event: Stripe.Event
   try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET!,
-    )
+    event = stripe.webhooks.constructEvent(body, signature, secret)
   } catch (err) {
     console.error('[webhook] signature verification failed:', err)
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
-  // 冪等性: event.id を Firestore で記録、重複は早期 return
+  // 冪等性: 重複イベントは早期 return（記録はハンドラ成功後）
   const eventRef = adminDb.collection('stripeEvents').doc(event.id)
   const eventSnap = await eventRef.get()
   if (eventSnap.exists) {
     return NextResponse.json({ received: true, duplicated: true })
   }
-  await eventRef.set({ type: event.type, createdAt: new Date() })
+
+  const stdPriceId   = process.env.STRIPE_PRICE_SUB_STD as string
+  const lightPriceId = process.env.STRIPE_PRICE_SUB_LIGHT as string
 
   try {
     switch (event.type) {
@@ -71,7 +84,14 @@ export async function POST(req: NextRequest) {
         const userId  = await resolveUserId(sub)
         if (!userId) break
 
-        const plan   = priceId === process.env.STRIPE_PRICE_SUB_STD ? 'sub_std' : 'sub_light'
+        const plan =
+          priceId === stdPriceId   ? 'sub_std'   :
+          priceId === lightPriceId ? 'sub_light' :
+          null
+        if (!plan) {
+          console.warn('[webhook] 未知の priceId:', priceId)
+          break
+        }
         const status = sub.status === 'active' ? plan : 'free'
 
         await adminDb.collection('users').doc(userId).set(
@@ -100,10 +120,17 @@ export async function POST(req: NextRequest) {
         break
       }
     }
+
+    // ハンドラ成功後に冪等性キーを記録（失敗時は Stripe にリトライさせる）
+    await eventRef.set({
+      type: event.type,
+      createdAt: new Date(),
+      expireAt: new Date(Date.now() + THIRTY_DAYS_MS),
+    })
+    return NextResponse.json({ received: true })
   } catch (err) {
-    console.error('[webhook] handler error:', err)
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error('[webhook] handler error:', msg, err)
     return NextResponse.json({ error: 'Handler error' }, { status: 500 })
   }
-
-  return NextResponse.json({ received: true })
 }
