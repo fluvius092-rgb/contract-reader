@@ -1,11 +1,39 @@
 // src/app/page.tsx
 'use client'
 
+import { Suspense, useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useAnalyze } from '@/lib/hooks/useAnalyze'
 import { UploadZone } from '@/components/features/UploadZone'
 import { AnalysisResultView } from '@/components/features/AnalysisResult'
 import { AnalyzingState } from '@/components/features/AnalyzingState'
 import { AdBanner } from '@/components/ui/AdBanner'
+import { PlanGate } from '@/components/features/PlanGate'
+import { ManageSubscription } from '@/components/features/ManageSubscription'
+
+function PaymentToast() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const [toast, setToast] = useState<'success' | 'cancel' | null>(null)
+
+  useEffect(() => {
+    const payment = searchParams.get('payment')
+    if (payment === 'success' || payment === 'cancel') {
+      setToast(payment)
+      router.replace('/')
+    }
+  }, [searchParams, router])
+
+  if (!toast) return null
+  return (
+    <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl shadow-lg text-sm font-medium text-white ${toast === 'success' ? 'bg-green-600' : 'bg-gray-600'}`}>
+      {toast === 'success'
+        ? '決済が完了しました。プラン反映まで少々お待ちください。'
+        : '決済がキャンセルされました。'}
+      <button onClick={() => setToast(null)} className="ml-3 opacity-70 hover:opacity-100">✕</button>
+    </div>
+  )
+}
 
 export default function HomePage() {
   const { state, analyze, reset } = useAnalyze()
@@ -20,9 +48,17 @@ export default function HomePage() {
             <span className="text-xl">📋</span>
             <span className="font-bold text-gray-900">契約書かんたん読み</span>
           </div>
-          <span className="text-xs text-gray-400">無料・広告掲載</span>
+          <div className="flex items-center gap-3">
+            <ManageSubscription />
+            <span className="text-xs text-gray-400">無料・広告掲載</span>
+          </div>
         </div>
       </header>
+
+      {/* ── Payment toast ── */}
+      <Suspense>
+        <PaymentToast />
+      </Suspense>
 
       {/* ── Main ── */}
       <main className="max-w-lg mx-auto px-4 py-6">
@@ -160,17 +196,26 @@ export default function HomePage() {
         {/* エラー */}
         {state.status === 'error' && (
           <div className="space-y-4">
-            <div className="bg-red-50 border border-red-200 rounded-2xl p-5 text-center">
-              <p className="text-2xl mb-2">😔</p>
-              <p className="font-semibold text-red-700 mb-1">解析できませんでした</p>
-              <p className="text-sm text-red-600">{state.error}</p>
-            </div>
-            <button
-              onClick={reset}
-              className="w-full py-3 bg-gray-900 text-white rounded-xl font-semibold text-sm hover:bg-gray-700"
-            >
-              もう一度試す
-            </button>
+            {state.planRequired ? (
+              <PlanGate
+                reason={state.error ?? undefined}
+                onClose={reset}
+              />
+            ) : (
+              <>
+                <div className="bg-red-50 border border-red-200 rounded-2xl p-5 text-center">
+                  <p className="text-2xl mb-2">😔</p>
+                  <p className="font-semibold text-red-700 mb-1">解析できませんでした</p>
+                  <p className="text-sm text-red-600">{state.error}</p>
+                </div>
+                <button
+                  onClick={reset}
+                  className="w-full py-3 bg-gray-900 text-white rounded-xl font-semibold text-sm hover:bg-gray-700"
+                >
+                  もう一度試す
+                </button>
+              </>
+            )}
           </div>
         )}
 

@@ -10,6 +10,20 @@ service cloud.firestore {
                          && request.auth.uid == userId;
     }
 
+    // ── ユーザープロファイル（Admin SDK のみ書き込み可）──
+    match /users/{uid} {
+      allow read:  if request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // ── レートリミット・Stripe イベント（クライアント不可）─
+    match /rateLimits/{id} {
+      allow read, write: if false;
+    }
+    match /stripeEvents/{id} {
+      allow read, write: if false;
+    }
+
     // ── その他は全アクセス禁止 ────────────────────────────
     match /{document=**} {
       allow read, write: if false;
