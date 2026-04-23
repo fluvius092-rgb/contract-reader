@@ -7,6 +7,7 @@ export const dynamic = 'force-dynamic'
 import { z } from 'zod'
 import { stripe, STRIPE_PRICES, validateStripeConfig } from '@/lib/stripe'
 import { verifyIdToken, adminDb } from '@/lib/firebase-admin'
+import { logError } from '@/lib/logSafe'
 
 const RequestSchema = z.object({
   priceKey: z.enum(['oneTime', 'subLight', 'subStd']),
@@ -60,7 +61,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ url: session.url })
 
   } catch (err) {
-    console.error('[stripe/checkout]', err)
+    logError('stripe/checkout', err)
     return NextResponse.json(
       { error: '決済セッションの作成に失敗しました' },
       { status: 500 },

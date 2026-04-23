@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { adminStorage, verifyIdToken } from '@/lib/firebase-admin'
 import { randomUUID } from 'crypto'
+import { logError } from '@/lib/logSafe'
 
 const ALLOWED_MIME_TYPES = [
   'application/pdf',
@@ -64,7 +65,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ files: uploaded })
 
   } catch (err) {
-    console.error('[upload] error:', err)
+    logError('upload', err)
 
     const errMsg   = err instanceof Error ? err.message : String(err)
     const httpStatus = (err as { httpStatus?: number })?.httpStatus ?? 500

@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { FieldValue } from 'firebase-admin/firestore'
 import { stripe, validateStripeConfig } from '@/lib/stripe'
 import { adminDb } from '@/lib/firebase-admin'
+import { logError } from '@/lib/logSafe'
 import type Stripe from 'stripe'
 
 export const runtime = 'nodejs'
@@ -29,7 +30,7 @@ export async function POST(req: NextRequest) {
   }
 
   try { validateStripeConfig() } catch (err) {
-    console.error('[webhook] config error:', err)
+    logError('webhook/config', err)
     return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
   }
 
@@ -40,7 +41,7 @@ export async function POST(req: NextRequest) {
   try {
     event = stripe.webhooks.constructEvent(body, signature, secret)
   } catch (err) {
-    console.error('[webhook] signature verification failed:', err)
+    logError('webhook/signature', err)
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
@@ -129,8 +130,7 @@ export async function POST(req: NextRequest) {
     })
     return NextResponse.json({ received: true })
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err)
-    console.error('[webhook] handler error:', msg, err)
+    logError('webhook/handler', err)
     return NextResponse.json({ error: 'Handler error' }, { status: 500 })
   }
 }
