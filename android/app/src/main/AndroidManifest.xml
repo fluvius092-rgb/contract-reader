@@ -10,7 +10,7 @@
 
         <!-- TWA メインActivity -->
         <activity
-            android:name="com.contractreader.app.LauncherActivity"
+            android:name="app.settlabs.contractreader.LauncherActivity"
             android:exported="true"
             android:theme="@style/Theme.ContractReader.Launch">
 

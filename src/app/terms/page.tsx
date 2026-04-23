@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import type { Metadata } from 'next'
 
 export const dynamic = 'force-static'
@@ -12,10 +13,10 @@ export default function TermsPage() {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-2xl mx-auto px-4 py-3">
-          <a href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <span className="text-xl">📋</span>
             <span className="font-bold text-gray-900">契約書かんたん読み</span>
-          </a>
+          </Link>
         </div>
       </header>
 
@@ -104,7 +105,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-base font-bold text-gray-900 mb-2">第8条（個人情報）</h2>
             <ol className="list-decimal pl-5 space-y-1">
-              <li>運営者は、本サービスの利用によって取得する個人情報を、別途定める「<a href="/privacy" className="text-blue-600 hover:underline">プライバシーポリシー</a>」に従い、適切に取り扱うものとします。</li>
+              <li>運営者は、本サービスの利用によって取得する個人情報を、別途定める「<Link href="/privacy" className="text-blue-600 hover:underline">プライバシーポリシー</Link>」に従い、適切に取り扱うものとします。</li>
               <li>ユーザーは、本サービスの利用にあたり、プライバシーポリシーに同意するものとします。</li>
             </ol>
           </section>
@@ -137,11 +138,11 @@ export default function TermsPage() {
       <footer className="border-t border-gray-200 bg-white mt-12">
         <div className="max-w-2xl mx-auto px-4 py-6">
           <nav className="flex flex-wrap gap-4 justify-center text-sm text-gray-500">
-            <a href="/" className="hover:text-gray-900">トップページ</a>
-            <a href="/about" className="hover:text-gray-900">サービスについて</a>
-            <a href="/terms" className="hover:text-gray-900">利用規約</a>
-            <a href="/privacy" className="hover:text-gray-900">プライバシーポリシー</a>
-            <a href="/contact" className="hover:text-gray-900">お問い合わせ</a>
+            <Link href="/" className="hover:text-gray-900">トップページ</Link>
+            <Link href="/about" className="hover:text-gray-900">サービスについて</Link>
+            <Link href="/terms" className="hover:text-gray-900">利用規約</Link>
+            <Link href="/privacy" className="hover:text-gray-900">プライバシーポリシー</Link>
+            <Link href="/contact" className="hover:text-gray-900">お問い合わせ</Link>
           </nav>
         </div>
       </footer>

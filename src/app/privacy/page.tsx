@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import type { Metadata } from 'next'
 
 export const dynamic = 'force-static'
@@ -11,10 +12,10 @@ export default function PrivacyPage() {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-2xl mx-auto px-4 py-3">
-          <a href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <span className="text-xl">📋</span>
             <span className="font-bold text-gray-900">契約書かんたん読み</span>
-          </a>
+          </Link>
         </div>
       </header>
 
@@ -114,7 +115,7 @@ export default function PrivacyPage() {
             <p>
               プライバシーに関するお問い合わせは以下までご連絡ください。
             </p>
-            <p className="mt-1 font-medium">メール: contract-reader@example.com</p>
+            <p className="mt-1 font-medium">メール: settlabs.app@gmail.com</p>
           </section>
 
           <p className="text-xs text-gray-400 pt-4 border-t border-gray-100">
@@ -126,11 +127,11 @@ export default function PrivacyPage() {
       <footer className="border-t border-gray-200 mt-8">
         <div className="max-w-2xl mx-auto px-4 py-6 text-center space-y-3">
           <nav className="flex flex-wrap justify-center gap-4 text-xs text-gray-500">
-            <a href="/" className="hover:text-gray-700">ホーム</a>
-            <a href="/about" className="hover:text-gray-700">サービスについて</a>
-            <a href="/terms" className="hover:text-gray-700">利用規約</a>
-            <a href="/privacy" className="hover:text-gray-700">プライバシーポリシー</a>
-            <a href="/contact" className="hover:text-gray-700">お問い合わせ</a>
+            <Link href="/" className="hover:text-gray-700">ホーム</Link>
+            <Link href="/about" className="hover:text-gray-700">サービスについて</Link>
+            <Link href="/terms" className="hover:text-gray-700">利用規約</Link>
+            <Link href="/privacy" className="hover:text-gray-700">プライバシーポリシー</Link>
+            <Link href="/contact" className="hover:text-gray-700">お問い合わせ</Link>
           </nav>
           <p className="text-xs text-gray-400">© 2025 契約書かんたん読み</p>
         </div>

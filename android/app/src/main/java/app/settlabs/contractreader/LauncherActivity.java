@@ -1,17 +1,13 @@
-package com.contractreader.app;
+package app.settlabs.contractreader;
 
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.browser.customtabs.CustomTabsIntent;
 
-/**
- * TWA ランチャーActivity
- * PWAをCustom Tabsで全画面表示する
- */
 public class LauncherActivity extends AppCompatActivity {
 
-    private static final String DEFAULT_URL = "https://contract-reader-qv4c.vercel.app";
+    private static final String DEFAULT_URL = "https://settlabs.app/contract_reader/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,7 +15,6 @@ public class LauncherActivity extends AppCompatActivity {
 
         String url = DEFAULT_URL;
 
-        // intent からURLを取得（ディープリンク対応）
         if (getIntent() != null && getIntent().getData() != null) {
             url = getIntent().getData().toString();
         }

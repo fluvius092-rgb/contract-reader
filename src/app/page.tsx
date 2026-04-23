@@ -1,8 +1,12 @@
 // src/app/page.tsx
 'use client'
 
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense, useCallback, useEffect, useState } from 'react'
+import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { onAuthStateChanged, type User } from 'firebase/auth'
+import { doc, onSnapshot } from 'firebase/firestore'
+import { auth, db } from '@/lib/firebase'
 import { useAnalyze } from '@/lib/hooks/useAnalyze'
 import { UploadZone } from '@/components/features/UploadZone'
 import { AnalysisResultView } from '@/components/features/AnalysisResult'
@@ -10,6 +14,8 @@ import { AnalyzingState } from '@/components/features/AnalyzingState'
 import { AdBanner } from '@/components/ui/AdBanner'
 import { PlanGate } from '@/components/features/PlanGate'
 import { ManageSubscription } from '@/components/features/ManageSubscription'
+import { AuthButton } from '@/components/features/AuthButton'
+import type { CategoryId } from '@/types'
 
 function PaymentToast() {
   const router = useRouter()
@@ -21,6 +27,10 @@ function PaymentToast() {
     if (payment === 'success' || payment === 'cancel') {
       setToast(payment)
       router.replace('/')
+      if (payment === 'success') {
+        const t = setTimeout(() => window.location.reload(), 5000)
+        return () => clearTimeout(t)
+      }
     }
   }, [searchParams, router])
 
@@ -28,15 +38,87 @@ function PaymentToast() {
   return (
     <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl shadow-lg text-sm font-medium text-white ${toast === 'success' ? 'bg-green-600' : 'bg-gray-600'}`}>
       {toast === 'success'
-        ? '決済が完了しました。プラン反映まで少々お待ちください。'
+        ? 'プラン反映まで少々お待ちください（自動更新します）'
         : '決済がキャンセルされました。'}
       <button onClick={() => setToast(null)} className="ml-3 opacity-70 hover:opacity-100">✕</button>
     </div>
   )
 }
 
+interface PendingAnalysis {
+  files: File[]
+  category: CategoryId
+  question?: string
+}
+
 export default function HomePage() {
   const { state, analyze, reset } = useAnalyze()
+
+  const [user, setUser]                   = useState<User | null | undefined>(undefined)
+  const [oneTimeCredits, setCredits]      = useState(0)
+  const [userPlan, setUserPlan]           = useState<'free' | 'sub_light' | 'sub_std'>('free')
+  const [analysesRemaining, setRemaining] = useState<number | null>(null)
+  const [pendingAnalysis, setPending]     = useState<PendingAnalysis | null>(null)
+  const [showPromo, setShowPromo]         = useState(false)
+
+  useEffect(() => {
+    return onAuthStateChanged(auth, setUser)
+  }, [])
+
+  useEffect(() => {
+    if (!user) { setCredits(0); setUserPlan('free'); return }
+    return onSnapshot(doc(db, 'users', user.uid), snap => {
+      const data = snap.data()
+      setCredits((data?.oneTimeCredits as number | undefined) ?? 0)
+      setUserPlan((data?.plan as 'free' | 'sub_light' | 'sub_std' | undefined) ?? 'free')
+    })
+  }, [user])
+
+  // 残回数を /api/remaining から取得（未ログイン・無料プランのみ）
+  const fetchRemaining = useCallback(async () => {
+    try {
+      const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+      const idToken  = await auth.currentUser?.getIdToken() ?? null
+      const headers: Record<string, string> = idToken ? { Authorization: `Bearer ${idToken}` } : {}
+      const res  = await fetch(`${basePath}/api/remaining`, { headers, cache: 'no-store' })
+      if (!res.ok) return
+      const { remaining } = await res.json() as { remaining: number }
+      setRemaining(remaining)
+    } catch { /* サイレント */ }
+  }, [])
+
+  useEffect(() => {
+    if (user === undefined) return          // 認証状態確定待ち
+    if (oneTimeCredits > 0) { setRemaining(null); return }
+    if (userPlan !== 'free' && user !== null) { setRemaining(null); return }
+    fetchRemaining()
+  }, [user, userPlan, oneTimeCredits, fetchRemaining])
+
+  // 解析完了後に残回数を更新
+  useEffect(() => {
+    if (state.status === 'done' || state.status === 'error') fetchRemaining()
+  }, [state.status, fetchRemaining])
+
+  const isFreeTier = user !== undefined
+    && (user === null || (userPlan === 'free' && oneTimeCredits === 0))
+
+  const handleAnalyze = useCallback(
+    (files: File[], category: CategoryId, question?: string) => {
+      if (oneTimeCredits > 0) {
+        setPending({ files, category, question })
+        return
+      }
+      analyze(files, category, question)
+    },
+    [oneTimeCredits, analyze],
+  )
+
+  const confirmUseTicket = useCallback(() => {
+    if (!pendingAnalysis) return
+    const { files, category, question } = pendingAnalysis
+    setPending(null)
+    analyze(files, category, question)
+  }, [pendingAnalysis, analyze])
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -50,7 +132,7 @@ export default function HomePage() {
           </div>
           <div className="flex items-center gap-3">
             <ManageSubscription />
-            <span className="text-xs text-gray-400">無料・広告掲載</span>
+            <AuthButton />
           </div>
         </div>
       </header>
@@ -76,8 +158,30 @@ export default function HomePage() {
             </div>
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
               <UploadZone
-                onSubmit={analyze}
+                onSubmit={handleAnalyze}
                 isLoading={false}
+                planBadge={isFreeTier ? (
+                  <div className="flex items-center justify-between gap-3 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl border border-indigo-100 px-3 py-2.5">
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold text-gray-800">
+                        {user ? '無料プランをご利用中' : '無料でお試し中'}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        {analysesRemaining !== null
+                          ? `今月あと ${analysesRemaining} 回 / 最大${user ? 20 : 10}枚まで`
+                          : user ? '月1回・最大20枚まで' : '月1回・最大10枚まで'
+                        }
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowPromo(true)}
+                      className="shrink-0 text-xs font-semibold text-indigo-600 hover:text-indigo-800 whitespace-nowrap"
+                    >
+                      プランを見る →
+                    </button>
+                  </div>
+                ) : undefined}
               />
             </div>
 
@@ -158,7 +262,7 @@ export default function HomePage() {
               <div className="space-y-3 text-sm">
                 <div>
                   <p className="font-semibold text-gray-800">Q. 本当に無料ですか？</p>
-                  <p className="text-gray-600 mt-0.5">はい、完全無料でご利用いただけます。広告収入により運営しています。</p>
+                  <p className="text-gray-600 mt-0.5">基本利用は無料です。会員登録なしで月1回（最大10枚）お試しいただけます。より多くご利用になりたい方には、月額¥300〜の有料プランもご用意しています。</p>
                 </div>
                 <div>
                   <p className="font-semibold text-gray-800">Q. アップロードした契約書は安全ですか？</p>
@@ -169,9 +273,9 @@ export default function HomePage() {
                   <p className="text-gray-600 mt-0.5">AIによる参考情報です。重要な判断をされる場合は、弁護士などの専門家にご相談ください。</p>
                 </div>
               </div>
-              <a href="/contact" className="block mt-3 text-sm text-indigo-600 hover:underline">
+              <Link href="/contact" className="block mt-3 text-sm text-indigo-600 hover:underline">
                 → その他のよくある質問はこちら
-              </a>
+              </Link>
             </div>
 
             {/* トップページ下部の広告 */}
@@ -200,7 +304,33 @@ export default function HomePage() {
               <PlanGate
                 reason={state.error ?? undefined}
                 onClose={reset}
+                existingOneTimeCredits={oneTimeCredits}
+                currentPlan={user ? 'free' : 'anonymous'}
               />
+            ) : state.serviceUnavailable ? (
+              <>
+                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-center space-y-3">
+                  <p className="text-3xl">🔧</p>
+                  <p className="font-bold text-amber-800 text-base">サービスが一時的に利用できません</p>
+                  <p className="text-sm text-amber-700 leading-relaxed">{state.error}</p>
+                  <div className="border-t border-amber-200 pt-3 text-xs text-amber-600 space-y-1">
+                    <p>しばらく時間をおいてから再度お試しください。</p>
+                    <p>
+                      問題が解決しない場合は{' '}
+                      <a href="/contact" className="underline font-medium hover:text-amber-800">
+                        お問い合わせ
+                      </a>
+                      {' '}からご連絡ください。
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={reset}
+                  className="w-full py-3 bg-gray-900 text-white rounded-xl font-semibold text-sm hover:bg-gray-700"
+                >
+                  戻る
+                </button>
+              </>
             ) : (
               <>
                 <div className="bg-red-50 border border-red-200 rounded-2xl p-5 text-center">
@@ -237,14 +367,66 @@ export default function HomePage() {
 
       </main>
 
+      {/* ── プランプロモモーダル（未登録・無料） ── */}
+      {showPromo && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={e => { if (e.target === e.currentTarget) setShowPromo(false) }}
+        >
+          <div className="w-full max-w-sm">
+            <PlanGate
+              variant="promo"
+              currentPlan={user ? 'free' : 'anonymous'}
+              onClose={() => setShowPromo(false)}
+              existingOneTimeCredits={oneTimeCredits}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ── チケット使用確認モーダル ── */}
+      {pendingAnalysis && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={e => { if (e.target === e.currentTarget) setPending(null) }}
+        >
+          <div className="w-full max-w-sm bg-white rounded-2xl p-6 space-y-5">
+            <div className="text-center">
+              <p className="text-3xl mb-2">🎟️</p>
+              <h2 className="font-bold text-gray-900 text-lg">チケットを使用しますか？</h2>
+              <p className="text-sm text-gray-500 mt-2">
+                都度課金チケット（残り <span className="font-semibold text-gray-700">{oneTimeCredits}回</span>）を
+                1回使用して解析します。
+              </p>
+            </div>
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={confirmUseTicket}
+                className="w-full py-3 bg-gray-900 text-white rounded-xl font-semibold text-sm hover:bg-gray-700 active:scale-95 transition-all"
+              >
+                使用して解析する
+              </button>
+              <button
+                type="button"
+                onClick={() => setPending(null)}
+                className="w-full py-2 text-sm text-gray-400 hover:text-gray-600"
+              >
+                キャンセル
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Footer ── */}
       <footer className="border-t border-gray-200 mt-8">
         <div className="max-w-lg mx-auto px-4 py-6 text-center space-y-3">
           <nav className="flex flex-wrap justify-center gap-4 text-xs text-gray-500">
-            <a href="/about" className="hover:text-gray-700">サービスについて</a>
-            <a href="/terms" className="hover:text-gray-700">利用規約</a>
-            <a href="/privacy" className="hover:text-gray-700">プライバシーポリシー</a>
-            <a href="/contact" className="hover:text-gray-700">お問い合わせ</a>
+            <Link href="/about"   className="hover:text-gray-700">サービスについて</Link>
+            <Link href="/terms"   className="hover:text-gray-700">利用規約</Link>
+            <Link href="/privacy" className="hover:text-gray-700">プライバシーポリシー</Link>
+            <Link href="/contact" className="hover:text-gray-700">お問い合わせ</Link>
           </nav>
           <p className="text-xs text-gray-400">© 2025 契約書かんたん読み</p>
           <p className="text-xs text-gray-400">本サービスはAIによる参考情報の提供であり、法的助言ではありません</p>

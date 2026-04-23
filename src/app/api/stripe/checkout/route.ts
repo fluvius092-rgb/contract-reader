@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 import { z } from 'zod'
-import { stripe, STRIPE_PRICES } from '@/lib/stripe'
+import { stripe, STRIPE_PRICES, validateStripeConfig } from '@/lib/stripe'
 import { verifyIdToken, adminDb } from '@/lib/firebase-admin'
 
 const RequestSchema = z.object({
@@ -16,6 +16,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://settlabs.app/contr
 
 export async function POST(req: NextRequest) {
   try {
+    validateStripeConfig()
     const userId = await verifyIdToken(req)
     if (!userId) {
       return NextResponse.json(
@@ -47,13 +48,13 @@ export async function POST(req: NextRequest) {
       success_url:         `${BASE_URL}/?payment=success`,
       cancel_url:          `${BASE_URL}/?payment=cancel`,
       client_reference_id: userId,
-      metadata:            { userId, priceKey },
+      metadata:            { userId, priceKey } as Record<string, string>,
       ...(existingCustomerId
         ? { customer: existingCustomerId }
         : { customer_creation: isOneTime ? 'always' : undefined }),
       ...(isOneTime
         ? {}
-        : { subscription_data: { metadata: { userId, priceKey } } }),
+        : { subscription_data: { metadata: { userId, priceKey } as Record<string, string> } }),
     })
 
     return NextResponse.json({ url: session.url })

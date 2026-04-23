@@ -1,6 +1,7 @@
 // src/app/auth/page.tsx
 'use client'
 
+import Link from 'next/link'
 import { useState } from 'react'
 import {
   signInWithPopup, GoogleAuthProvider,
@@ -133,7 +134,7 @@ export default function AuthPage() {
         </p>
 
         <p className="text-center">
-          <a href="/" className="text-xs text-gray-400 underline">ログインせず使う</a>
+          <Link href="/" className="text-xs text-gray-400 underline">ログインせず使う</Link>
         </p>
       </div>
     </div>

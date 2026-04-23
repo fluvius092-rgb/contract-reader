@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import type { Metadata } from 'next'
 
 export const dynamic = 'force-static'
@@ -12,10 +13,10 @@ export default function ContactPage() {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-2xl mx-auto px-4 py-3">
-          <a href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <span className="text-xl">📋</span>
             <span className="font-bold text-gray-900">契約書かんたん読み</span>
-          </a>
+          </Link>
         </div>
       </header>
 
@@ -30,7 +31,7 @@ export default function ContactPage() {
               「契約書かんたん読み」に関するお問い合わせは、以下のメールアドレスまでご連絡ください。
             </p>
             <p className="mt-2 font-medium">
-              メール: <a href="mailto:contract-reader@example.com" className="text-blue-600 hover:underline">contract-reader@example.com</a>
+              メール: <a href="mailto:settlabs.app@gmail.com" className="text-blue-600 hover:underline">settlabs.app@gmail.com</a>
             </p>
             <p className="mt-2 text-xs text-gray-500">
               ※ 回答までに3営業日程度お時間をいただく場合がございます。あらかじめご了承ください。
@@ -55,89 +56,144 @@ export default function ContactPage() {
           <section>
             <h2 className="text-base font-bold text-gray-900 mb-3">よくある質問（FAQ）</h2>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
+
+              {/* ── 基本 ── */}
               <div>
-                <h3 className="font-bold text-gray-900">Q: 無料で使えますか？</h3>
-                <p className="mt-1">
-                  A: はい、無料でご利用いただけます。アカウント登録をしなくてもすぐにお使いいただけます。
-                  基本的な契約書の解析機能はすべて無料で提供しております。
-                </p>
+                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">基本的な使い方</h3>
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-bold text-gray-900">Q: 無料で使えますか？</h4>
+                    <p className="mt-1">
+                      A: 1日1回まで無料でご利用いただけます（アカウント登録後は月3回まで無料）。
+                      アカウント登録をしなくてもすぐにお使いいただけます。
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-bold text-gray-900">Q: 対応している契約書の種類は？</h4>
+                    <p className="mt-1">
+                      A: 不動産賃貸契約書、携帯電話契約書、保険契約書、ローン契約書、雇用契約書に対応しています。
+                      「その他」カテゴリを選択することで、上記以外の一般的な契約書も解析可能です。
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-bold text-gray-900">Q: 対応しているファイル形式は？</h4>
+                    <p className="mt-1">
+                      A: PDF・JPEG・PNG・WebP・HEICに対応しています。スマートフォンで撮影した写真もそのままアップロード可能です。
+                      1回あたり最大20枚（プランにより異なる）まで同時にアップロードできます。
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-bold text-gray-900">Q: アップロードした契約書はどうなりますか？</h4>
+                    <p className="mt-1">
+                      A: アップロードされたファイルは、AI解析が完了した直後にサーバーから完全に削除されます。
+                      第三者への提供やAI学習への使用は一切行いません。
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-bold text-gray-900">Q: AIの解析結果は正確ですか？</h4>
+                    <p className="mt-1">
+                      A: AIによる参考情報としてご利用ください。法的助言や専門家の意見に代わるものではありません。
+                      重要な判断をされる際は、弁護士等の専門家にご相談ください。
+                    </p>
+                  </div>
+                </div>
               </div>
 
+              {/* ── 課金・プラン ── */}
               <div>
-                <h3 className="font-bold text-gray-900">Q: 対応している契約書の種類は？</h3>
-                <p className="mt-1">
-                  A: 現在、不動産賃貸契約書、携帯電話契約書、生命保険・医療保険契約書、住宅ローン契約書、
-                  雇用契約書・労働条件通知書に対応しています。これら以外の一般的な契約書も解析可能な場合があります。
-                </p>
+                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">課金・プランについて</h3>
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-bold text-gray-900">Q: プランの種類を教えてください</h4>
+                    <p className="mt-1">
+                      A: 以下の3プランをご用意しています。
+                    </p>
+                    <ul className="mt-2 space-y-1 pl-4">
+                      <li>・<strong>都度課金（¥500）</strong>: 1回だけ使いたい方向け。最大60枚まで対応。有効期限なし。</li>
+                      <li>・<strong>ライトプラン（¥300/月）</strong>: 月3回まで解析可能。最大20枚/回。</li>
+                      <li>・<strong>スタンダードプラン（¥500/月）</strong>: 月5回まで解析可能。最大20枚/回。</li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h4 className="font-bold text-gray-900">Q: 都度課金チケットの有効期限はありますか？</h4>
+                    <p className="mt-1">
+                      A: 有効期限はありません。購入後、好きなタイミングでご利用いただけます。
+                      複数枚購入した場合も、残ったチケットはそのまま繰り越されます。
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-bold text-gray-900">Q: チケットを持っている状態でさらに購入できますか？</h4>
+                    <p className="mt-1">
+                      A: 可能です。ただし、購入時に「チケットが残っています」という確認画面が表示されます。
+                      内容をご確認の上、追加購入を行ってください。
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-bold text-gray-900">Q: サブスクリプションはいつでも解約できますか？</h4>
+                    <p className="mt-1">
+                      A: はい、いつでも解約できます。解約後も、支払い済みの期間末日までサービスをご利用いただけます。
+                      解約はヘッダーの「サブスクリプション管理」から手続きできます。
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-bold text-gray-900">Q: 支払い方法は何が使えますか？</h4>
+                    <p className="mt-1">
+                      A: Stripeを通じて、クレジットカード（Visa・Mastercard・American Express・JCBなど）でお支払いいただけます。
+                      決済情報はStripeが管理し、当サービスでカード番号を保持することはありません。
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-bold text-gray-900">Q: 返金はできますか？</h4>
+                    <p className="mt-1">
+                      A: 原則として返金には対応しておりません。
+                      ただし、システム障害など当サービス起因の問題が発生した場合は、
+                      <a href="mailto:settlabs.app@gmail.com" className="text-blue-600 hover:underline">settlabs.app@gmail.com</a> までご連絡ください。
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-bold text-gray-900">Q: 月の途中でプランを変更した場合は？</h4>
+                    <p className="mt-1">
+                      A: サブスクリプションの変更はStripeの管理画面から行えます。
+                      詳細な日割り計算等はStripeの規定に従います。
+                      変更・解約はヘッダーの「サブスクリプション管理」からご確認ください。
+                    </p>
+                  </div>
+                </div>
               </div>
 
+              {/* ── アカウント ── */}
               <div>
-                <h3 className="font-bold text-gray-900">Q: アップロードした契約書はどうなりますか？</h3>
-                <p className="mt-1">
-                  A: アップロードされた契約書ファイルは、AIによる解析が完了した直後にサーバーから完全に削除されます。
-                  お客様の契約書データが不必要に保存されることはありませんので、安心してご利用ください。
-                </p>
+                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">アカウントについて</h3>
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-bold text-gray-900">Q: アカウント登録は必要ですか？</h4>
+                    <p className="mt-1">
+                      A: 登録なしでも利用できますが、課金プランの利用・解析履歴の保存にはアカウントが必要です。
+                      Googleアカウントまたはメールアドレスとパスワードで登録できます。
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-bold text-gray-900">Q: アカウントを削除したいのですが？</h4>
+                    <p className="mt-1">
+                      A: <Link href="/account-delete" className="text-blue-600 hover:underline">アカウント削除ページ</Link>からお手続きいただけます。
+                      削除すると解析履歴もすべて消去されます。この操作は取り消しできません。
+                    </p>
+                  </div>
+                </div>
               </div>
 
-              <div>
-                <h3 className="font-bold text-gray-900">Q: アカウント登録は必要ですか？</h3>
-                <p className="mt-1">
-                  A: アカウント登録をしなくても契約書の解析機能をご利用いただけます。
-                  ただし、過去の解析履歴を保存して後から確認したい場合は、アカウント登録が必要です。
-                  Googleアカウントまたはメールアドレスで簡単に登録できます。
-                </p>
-              </div>
-
-              <div>
-                <h3 className="font-bold text-gray-900">Q: AIの解析結果は正確ですか？</h3>
-                <p className="mt-1">
-                  A: AIの解析結果はあくまで参考情報としてご利用ください。法的助言や専門家の意見に代わるものではありません。
-                  契約の締結や解約など重要な判断を行う際は、必ず弁護士等の専門家にご相談ください。
-                </p>
-              </div>
-
-              <div>
-                <h3 className="font-bold text-gray-900">Q: スマートフォンで使えますか？</h3>
-                <p className="mt-1">
-                  A: はい、スマートフォンに対応しています。iPhone、Androidのどちらからでもブラウザで
-                  アクセスしてご利用いただけます。アプリのインストールは不要です。
-                </p>
-              </div>
-
-              <div>
-                <h3 className="font-bold text-gray-900">Q: 対応しているファイル形式は？</h3>
-                <p className="mt-1">
-                  A: PDF形式および画像形式（JPG、PNG）に対応しています。
-                  契約書をスマートフォンのカメラで撮影した写真もアップロード可能です。
-                  なるべく文字がはっきり読める状態で撮影してください。
-                </p>
-              </div>
-
-              <div>
-                <h3 className="font-bold text-gray-900">Q: 解析にかかる時間はどのくらいですか？</h3>
-                <p className="mt-1">
-                  A: 通常、数秒から1分程度で解析が完了します。契約書のページ数や内容の複雑さにより、
-                  多少前後する場合がございます。
-                </p>
-              </div>
-
-              <div>
-                <h3 className="font-bold text-gray-900">Q: アカウントを削除したいのですが？</h3>
-                <p className="mt-1">
-                  A: アカウントの削除は<a href="/delete-account" className="text-blue-600 hover:underline">アカウント削除ページ</a>から
-                  お手続きいただけます。アカウントを削除すると、保存されている解析履歴もすべて削除されます。
-                  この操作は取り消すことができませんのでご注意ください。
-                </p>
-              </div>
-
-              <div>
-                <h3 className="font-bold text-gray-900">Q: 英語の契約書に対応していますか？</h3>
-                <p className="mt-1">
-                  A: 現在は日本語の契約書のみに対応しております。英語およびその他の言語の契約書への対応は、
-                  今後のアップデートで検討しております。
-                </p>
-              </div>
             </div>
           </section>
 
@@ -147,11 +203,11 @@ export default function ContactPage() {
       <footer className="border-t border-gray-200 bg-white mt-12">
         <div className="max-w-2xl mx-auto px-4 py-6">
           <nav className="flex flex-wrap gap-4 justify-center text-sm text-gray-500">
-            <a href="/" className="hover:text-gray-900">トップページ</a>
-            <a href="/about" className="hover:text-gray-900">サービスについて</a>
-            <a href="/terms" className="hover:text-gray-900">利用規約</a>
-            <a href="/privacy" className="hover:text-gray-900">プライバシーポリシー</a>
-            <a href="/contact" className="hover:text-gray-900">お問い合わせ</a>
+            <Link href="/" className="hover:text-gray-900">トップページ</Link>
+            <Link href="/about" className="hover:text-gray-900">サービスについて</Link>
+            <Link href="/terms" className="hover:text-gray-900">利用規約</Link>
+            <Link href="/privacy" className="hover:text-gray-900">プライバシーポリシー</Link>
+            <Link href="/contact" className="hover:text-gray-900">お問い合わせ</Link>
           </nav>
         </div>
       </footer>
