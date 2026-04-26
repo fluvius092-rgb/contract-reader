@@ -32,8 +32,8 @@ const rows: { label: string; value: React.ReactNode }[] = [
   {
     label: 'メールアドレス',
     value: (
-      <a href="mailto:kawakita.takumi.0723@gmail.com" className="text-blue-600 hover:underline">
-        kawakita.takumi.0723@gmail.com
+      <a href="mailto:settlabs.app@gmail.com" className="text-blue-600 hover:underline">
+        settlabs.app@gmail.com
       </a>
     ),
   },
