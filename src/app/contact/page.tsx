@@ -207,6 +207,7 @@ export default function ContactPage() {
             <Link href="/about" className="hover:text-gray-900">サービスについて</Link>
             <Link href="/terms" className="hover:text-gray-900">利用規約</Link>
             <Link href="/privacy" className="hover:text-gray-900">プライバシーポリシー</Link>
+            <Link href="/tokusho" className="hover:text-gray-900">特定商取引法</Link>
             <Link href="/contact" className="hover:text-gray-900">お問い合わせ</Link>
           </nav>
         </div>

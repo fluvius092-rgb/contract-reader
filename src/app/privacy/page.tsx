@@ -131,6 +131,7 @@ export default function PrivacyPage() {
             <Link href="/about" className="hover:text-gray-700">サービスについて</Link>
             <Link href="/terms" className="hover:text-gray-700">利用規約</Link>
             <Link href="/privacy" className="hover:text-gray-700">プライバシーポリシー</Link>
+            <Link href="/tokusho" className="hover:text-gray-700">特定商取引法</Link>
             <Link href="/contact" className="hover:text-gray-700">お問い合わせ</Link>
           </nav>
           <p className="text-xs text-gray-400">© 2025 契約書かんたん読み</p>

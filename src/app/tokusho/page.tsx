@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 }
 
 const rows: { label: string; value: React.ReactNode }[] = [
-  { label: '販売業者', value: '川北 拓実' },
+  { label: '販売業者', value: 'settlabs（運営者: 川北 拓実）' },
   { label: '運営責任者', value: '川北 拓実' },
   {
     label: '所在地',
@@ -23,9 +23,12 @@ const rows: { label: string; value: React.ReactNode }[] = [
     label: '電話番号',
     value: (
       <>
-        請求があり次第、遅滞なく開示します
-        <br />
-        <span className="text-gray-400 text-xs">お問い合わせはメールにてお願いいたします</span>
+        <p>
+          ご請求があった場合、遅滞なく開示いたします。
+        </p>
+        <p className="mt-1">
+          下記メールアドレス宛にお問い合わせください。確認後、電話番号を記載した書面を遅滞なくご提供いたします。
+        </p>
       </>
     ),
   },
@@ -50,36 +53,80 @@ const rows: { label: string; value: React.ReactNode }[] = [
     ),
   },
   {
+    label: '商品代金以外の必要料金',
+    value: (
+      <>
+        <p>
+          サービスのご利用にあたり、インターネット接続料金および通信料はお客様のご負担となります。
+        </p>
+        <p className="mt-1">
+          上記販売価格は消費税込みの金額であり、当社からの追加手数料は発生いたしません。
+        </p>
+      </>
+    ),
+  },
+  {
     label: '支払方法',
     value: 'クレジットカード（Visa・Mastercard・American Express・JCB）',
   },
   {
     label: '支払時期',
-    value: 'サブスクリプション登録時に課金が発生し、以降は毎月同日に自動更新されます。',
+    value: (
+      <>
+        <p>初回: サブスクリプション登録時にお支払いが発生します。</p>
+        <p className="mt-1">2回目以降: 毎月の登録応当日に自動的に課金されます。</p>
+      </>
+    ),
   },
   {
     label: 'サービス提供時期',
     value: '決済完了後、即時ご利用いただけます。',
   },
   {
-    label: '返品・キャンセルについて',
+    label: '契約期間・自動更新',
     value: (
       <>
-        <p>サブスクリプションはいつでもキャンセル可能です。</p>
-        <p className="mt-1">
-          キャンセル後は現在の請求期間の終了日までサービスをご利用いただけます。
-          期間途中のご解約による返金は行っておりません。
+        <p>
+          本サブスクリプションは契約期間の定めのない自動更新契約です。
         </p>
         <p className="mt-1">
-          なお、デジタルコンテンツの性質上、サービス利用開始後の返金はいたしかねます。
-          あらかじめご了承ください。
+          毎月の登録応当日に自動的に契約が更新され、解約のお手続きをいただくまで料金が発生し続けます。
+        </p>
+      </>
+    ),
+  },
+  {
+    label: '解約方法',
+    value: (
+      <>
+        <p>
+          ログイン後、画面上部のヘッダーにある「サブスクリプション管理」ボタンをクリックしていただくと、Stripe のお客様ポータルに移動します。
+        </p>
+        <p className="mt-1">
+          ポータル画面の「プランをキャンセル」ボタンより、いつでもオンラインで解約手続きを完了できます。電話やメールでのお手続きは不要です。
+        </p>
+        <p className="mt-1">
+          解約後は現在の請求期間の終了日まで引き続きサービスをご利用いただけ、それ以降は自動的に無料プランへ移行します。
+        </p>
+      </>
+    ),
+  },
+  {
+    label: '返品・返金について',
+    value: (
+      <>
+        <p>
+          デジタルコンテンツの性質上、サービス利用開始後の返金および期間途中のご解約による日割り返金は行っておりません。
+        </p>
+        <p className="mt-1">
+          ただし、当社の責に帰すべき事由によりサービスをご利用いただけなかった場合は、別途ご相談に応じます。
         </p>
       </>
     ),
   },
   {
     label: '動作環境',
-    value: 'Chrome・Safari・Firefox・Edgeの最新バージョン（PC・スマートフォン対応）',
+    value: 'Chrome・Safari・Firefox・Edge の最新バージョン（PC・スマートフォン対応）',
   },
 ]
 
@@ -113,7 +160,7 @@ export default function TokushoPage() {
           </table>
         </div>
 
-        <p className="text-xs text-gray-400 mt-6">最終更新日: 2026年4月23日</p>
+        <p className="text-xs text-gray-400 mt-6">最終更新日: 2026年4月28日</p>
       </main>
 
       <footer className="border-t border-gray-200 bg-white mt-12">
