@@ -115,7 +115,7 @@ export default function PrivacyPage() {
             <p>
               プライバシーに関するお問い合わせは以下までご連絡ください。
             </p>
-            <p className="mt-1 font-medium">メール: settlabs.app@gmail.com</p>
+            <p className="mt-1 font-medium">メール: info@settlabs.app</p>
           </section>
 
           <p className="text-xs text-gray-400 pt-4 border-t border-gray-100">

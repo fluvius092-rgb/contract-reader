@@ -31,7 +31,7 @@ export default function ContactPage() {
               「契約書かんたん読み」に関するお問い合わせは、以下のメールアドレスまでご連絡ください。
             </p>
             <p className="mt-2 font-medium">
-              メール: <a href="mailto:settlabs.app@gmail.com" className="text-blue-600 hover:underline">settlabs.app@gmail.com</a>
+              メール: <a href="mailto:info@settlabs.app" className="text-blue-600 hover:underline">info@settlabs.app</a>
             </p>
             <p className="mt-2 text-xs text-gray-500">
               ※ 回答までに3営業日程度お時間をいただく場合がございます。あらかじめご了承ください。
@@ -157,7 +157,7 @@ export default function ContactPage() {
                     <p className="mt-1">
                       A: 原則として返金には対応しておりません。
                       ただし、システム障害など当サービス起因の問題が発生した場合は、
-                      <a href="mailto:settlabs.app@gmail.com" className="text-blue-600 hover:underline">settlabs.app@gmail.com</a> までご連絡ください。
+                      <a href="mailto:info@settlabs.app" className="text-blue-600 hover:underline">info@settlabs.app</a> までご連絡ください。
                     </p>
                   </div>
 

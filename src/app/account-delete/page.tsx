@@ -59,7 +59,7 @@ export default function AccountDeletePage() {
 
           <section className="bg-gray-50 rounded-xl p-4">
             <h2 className="text-base font-bold text-gray-900 mb-2">お問い合わせ先</h2>
-            <p className="font-medium">メール: settlabs.app@gmail.com</p>
+            <p className="font-medium">メール: info@settlabs.app</p>
             <p className="text-xs text-gray-400 mt-1">通常3営業日以内に返信いたします。</p>
           </section>
 
@@ -73,6 +73,7 @@ export default function AccountDeletePage() {
             <Link href="/about" className="hover:text-gray-700">サービスについて</Link>
             <Link href="/terms" className="hover:text-gray-700">利用規約</Link>
             <Link href="/privacy" className="hover:text-gray-700">プライバシーポリシー</Link>
+            <Link href="/tokusho" className="hover:text-gray-700">特定商取引法</Link>
             <Link href="/contact" className="hover:text-gray-700">お問い合わせ</Link>
           </nav>
           <p className="text-xs text-gray-400">© 2025 契約書かんたん読み</p>
