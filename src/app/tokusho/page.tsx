@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 }
 
 const rows: { label: string; value: React.ReactNode }[] = [
-  { label: '販売業者', value: 'settlabs（運営者: 川北 拓実）' },
-  { label: '運営責任者', value: '川北 拓実' },
+  { label: '販売業者', value: 'settlabs（運営者: 川北拓海）' },
+  { label: '運営責任者', value: '川北拓海' },
   {
     label: '所在地',
     value: (
@@ -21,16 +21,7 @@ const rows: { label: string; value: React.ReactNode }[] = [
   },
   {
     label: '電話番号',
-    value: (
-      <>
-        <p>
-          ご請求があった場合、遅滞なく開示いたします。
-        </p>
-        <p className="mt-1">
-          下記メールアドレス宛にお問い合わせください。確認後、電話番号を記載した書面を遅滞なくご提供いたします。
-        </p>
-      </>
-    ),
+    value: '050-6860-7271（受付時間: 平日10:00〜18:00）',
   },
   {
     label: 'メールアドレス',
@@ -160,7 +151,7 @@ export default function TokushoPage() {
           </table>
         </div>
 
-        <p className="text-xs text-gray-400 mt-6">最終更新日: 2026年4月28日</p>
+        <p className="text-xs text-gray-400 mt-6">最終更新日: 2026年5月7日</p>
       </main>
 
       <footer className="border-t border-gray-200 bg-white mt-12">
