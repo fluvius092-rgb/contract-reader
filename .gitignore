@@ -27,6 +27,12 @@ yarn-error.log*
 .env*.local
 .env
 
+# 機密キーを含むローカル開発スクリプト
+stripe-listen.bat
+
+# IDE
+.idea/
+
 # vercel
 .vercel
 
