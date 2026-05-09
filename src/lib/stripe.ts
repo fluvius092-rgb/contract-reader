@@ -4,7 +4,6 @@ import Stripe from 'stripe'
 const REQUIRED_ENV = [
   'STRIPE_SECRET_KEY',
   'STRIPE_WEBHOOK_SECRET',
-  'STRIPE_PRICE_ONE_TIME',
   'STRIPE_PRICE_SUB_LIGHT',
   'STRIPE_PRICE_SUB_STD',
 ] as const

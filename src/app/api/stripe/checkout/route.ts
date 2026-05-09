@@ -57,19 +57,8 @@ export async function POST(req: NextRequest) {
 
   } catch (err) {
     logError('stripe/checkout', err)
-    const e = err as { name?: string; message?: string; type?: string; code?: string; statusCode?: number; stack?: string }
     return NextResponse.json(
-      {
-        error: '決済セッションの作成に失敗しました',
-        _debug: {
-          name:       e.name,
-          message:    e.message,
-          type:       e.type,
-          code:       e.code,
-          statusCode: e.statusCode,
-          stack:      e.stack?.split('\n').slice(0, 5).join('\n'),
-        },
-      },
+      { error: '決済セッションの作成に失敗しました' },
       { status: 500 },
     )
   }
