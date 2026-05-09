@@ -205,11 +205,8 @@ export function PlanGate({ reason, onClose, existingOneTimeCredits = 0, variant 
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <p className={clsx('text-sm font-bold', isCurrent ? 'text-indigo-700' : 'text-gray-800')}>
-                      {plan.label}
+                      {plan.label}{isCurrent && '（現在）'}
                     </p>
-                    {isCurrent && (
-                      <span className="text-[10px] bg-indigo-500 text-white px-1.5 py-0.5 rounded-full">現在</span>
-                    )}
                     {isRec && !isCurrent && (
                       <span className="text-[10px] bg-blue-500 text-white px-1.5 py-0.5 rounded-full">{plan.badge}</span>
                     )}
