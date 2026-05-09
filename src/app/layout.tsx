@@ -1,8 +1,8 @@
 // src/app/layout.tsx
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import Script from 'next/script'
 import { Toaster } from 'react-hot-toast'
+import { AdSenseLoader } from '@/components/ui/AdSenseLoader'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -51,15 +51,8 @@ export default function RootLayout({
         {process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID && (
           <meta name="google-adsense-account" content={process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID} />
         )}
-        {/* AdSense — beforeInteractive でHTMLに直接出力（クローラー検出用） */}
-        {process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID && (
-          <Script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID}`}
-            crossOrigin="anonymous"
-            strategy="beforeInteractive"
-          />
-        )}
+        {/* AdSense JS — Web ブラウザでのみロード（TWA はスキップ） */}
+        <AdSenseLoader />
       </head>
       <body className={inter.className}>
         {children}
