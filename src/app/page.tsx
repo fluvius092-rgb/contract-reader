@@ -219,8 +219,8 @@ export default function HomePage() {
                           </p>
                           <p className="text-xs text-gray-500 mt-0.5">
                             {analysesRemaining !== null
-                              ? `今月あと ${analysesRemaining} 回 / 最大${user ? 20 : 10}枚まで`
-                              : user ? '月1回・最大20枚まで' : '月1回・最大10枚まで'
+                              ? `あと ${analysesRemaining} 回お試し可能 / 最大${user ? 20 : 10}枚まで`
+                              : user ? '1回お試し可能・最大20枚まで' : '1回お試し可能・最大10枚まで'
                             }
                           </p>
                         </div>

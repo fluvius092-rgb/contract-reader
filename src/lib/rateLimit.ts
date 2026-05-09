@@ -36,15 +36,15 @@ if (typeof setInterval !== 'undefined') {
 export type Plan = 'anonymous' | 'free' | 'one_time' | 'sub_light' | 'sub_std'
 
 interface PlanLimit {
-  analyses: number  // 解析回数/月
+  analyses: number  // 解析回数/期間
   pages:    number  // 最大ページ数/回
-  window:   'day' | 'month'
+  window:   'day' | 'month' | 'lifetime'
 }
 
 const PLAN_LIMITS: Record<Plan, PlanLimit> = {
-  anonymous: { analyses: 1,  pages: 10, window: 'month' },
-  free:      { analyses: 1,  pages: 20, window: 'month' },
-  one_time:  { analyses: 1,  pages: 20, window: 'month' },  // 1クレジット = 1回・最大20枚
+  anonymous: { analyses: 1,  pages: 10, window: 'lifetime' },  // 端末/IP 単位で生涯 1 回
+  free:      { analyses: 1,  pages: 20, window: 'lifetime' },  // ログインで追加 1 回（更新なし）
+  one_time:  { analyses: 1,  pages: 20, window: 'month' },     // 1クレジット = 1回・最大20枚
   sub_light: { analyses: 3,  pages: 20, window: 'month' },
   sub_std:   { analyses: 5,  pages: 20, window: 'month' },
 }
@@ -66,8 +66,13 @@ function thisMonthJST(): string {
 }
 
 export function buildKey(plan: Plan, ip: string, uid: string | null): string {
+  const limit = PLAN_LIMITS[plan]
+  // lifetime プランは年月を含めず生涯カウントを保持
+  if (limit.window === 'lifetime') {
+    return plan === 'anonymous' ? `ip_${ip}_lifetime` : `uid_${uid}_lifetime`
+  }
   if (plan === 'anonymous') return `ip_${ip}_${thisMonthJST()}`
-  // free 含む全プランで月次キー
+  // free 以外の通常プランは月次キー（free は lifetime に分岐済み）
   return `uid_${uid}_${thisMonthJST()}`
 }
 
@@ -131,7 +136,10 @@ export async function checkDailyLimit(
   const count: number = snap.data()?.count ?? 0
 
   if (count >= limit.analyses) {
-    const retryAfter = limit.window === 'day' ? '明日0時（JST）' : '来月1日'
+    const retryAfter =
+      limit.window === 'day'      ? '明日0時（JST）' :
+      limit.window === 'lifetime' ? '有料プランで継続利用できます' :
+                                    '来月1日'
     return { ok: false, plan, remaining: 0, retryAfter, maxPages: limit.pages, commit: noop }
   }
 
