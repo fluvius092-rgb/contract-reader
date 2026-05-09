@@ -156,34 +156,43 @@ export default function HomePage() {
                 不動産・携帯・保険・ローン・雇用に対応
               </p>
             </div>
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-              <UploadZone
-                onSubmit={handleAnalyze}
-                isLoading={false}
-                planBadge={isFreeTier ? (
-                  <div className="flex items-center justify-between gap-3 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl border border-indigo-100 px-3 py-2.5">
-                    <div className="min-w-0">
-                      <p className="text-xs font-semibold text-gray-800">
-                        {user ? '無料プランをご利用中' : '無料でお試し中'}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-0.5">
-                        {analysesRemaining !== null
-                          ? `今月あと ${analysesRemaining} 回 / 最大${user ? 20 : 10}枚まで`
-                          : user ? '月1回・最大20枚まで' : '月1回・最大10枚まで'
-                        }
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setShowPromo(true)}
-                      className="shrink-0 text-xs font-semibold text-indigo-600 hover:text-indigo-800 whitespace-nowrap"
-                    >
-                      プランを見る →
-                    </button>
-                  </div>
-                ) : undefined}
+            {isFreeTier && analysesRemaining === 0 ? (
+              <PlanGate
+                variant="limit"
+                reason={user ? '今月の無料利用枠を使い切りました' : '今月の利用枠を使い切りました'}
+                currentPlan={user ? 'free' : 'anonymous'}
+                existingOneTimeCredits={oneTimeCredits}
               />
-            </div>
+            ) : (
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                <UploadZone
+                  onSubmit={handleAnalyze}
+                  isLoading={false}
+                  planBadge={isFreeTier ? (
+                    <div className="flex items-center justify-between gap-3 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl border border-indigo-100 px-3 py-2.5">
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold text-gray-800">
+                          {user ? '無料プランをご利用中' : '無料でお試し中'}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          {analysesRemaining !== null
+                            ? `今月あと ${analysesRemaining} 回 / 最大${user ? 20 : 10}枚まで`
+                            : user ? '月1回・最大20枚まで' : '月1回・最大10枚まで'
+                          }
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowPromo(true)}
+                        className="shrink-0 text-xs font-semibold text-indigo-600 hover:text-indigo-800 whitespace-nowrap"
+                      >
+                        プランを見る →
+                      </button>
+                    </div>
+                  ) : undefined}
+                />
+              </div>
+            )}
 
             {/* 使い方セクション */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
