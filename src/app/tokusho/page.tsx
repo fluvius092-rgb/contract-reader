@@ -37,9 +37,10 @@ const rows: { label: string; value: React.ReactNode }[] = [
     label: '販売価格',
     value: (
       <ul className="space-y-1">
-        <li>無料プラン: 無料（月3回まで解析可能）</li>
-        <li>スタンダードプラン: 月額 ¥500（税込）／月30回まで解析可能</li>
-        <li>プレミアムプラン: 月額 ¥1,000（税込）／月100回まで解析可能</li>
+        <li>無料プラン: 無料（月3回まで解析可能・1回あたり最大20枚）</li>
+        <li>都度課金チケット: ¥500（税込）／1回限り・最大60枚まで対応・有効期限なし</li>
+        <li>ライトプラン: 月額 ¥300（税込）／月3回まで解析可能・1回あたり最大20枚</li>
+        <li>スタンダードプラン: 月額 ¥500（税込）／月5回まで解析可能・1回あたり最大20枚</li>
       </ul>
     ),
   },
@@ -151,7 +152,7 @@ export default function TokushoPage() {
           </table>
         </div>
 
-        <p className="text-xs text-gray-400 mt-6">最終更新日: 2026年5月7日</p>
+        <p className="text-xs text-gray-400 mt-6">最終更新日: 2026年5月9日</p>
       </main>
 
       <footer className="border-t border-gray-200 bg-white mt-12">
