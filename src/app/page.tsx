@@ -191,10 +191,15 @@ export default function HomePage() {
                 不動産・携帯・保険・ローン・雇用に対応
               </p>
             </div>
-            {isFreeTier && analysesRemaining === 0 ? (
+            {analysesRemaining === 0 && oneTimeCredits === 0 ? (
               <PlanGate
                 variant="limit"
-                reason={user ? '今月の無料利用枠を使い切りました' : '今月の利用枠を使い切りました'}
+                reason={
+                  userPlan === 'sub_std'   ? '今月のスタンダードプランの解析回数を使い切りました' :
+                  userPlan === 'sub_light' ? '今月のライトプランの解析回数を使い切りました' :
+                  user                     ? '今月の無料利用枠を使い切りました' :
+                                             '今月の利用枠を使い切りました'
+                }
                 currentPlan={currentPlanKey}
                 existingOneTimeCredits={oneTimeCredits}
               />
