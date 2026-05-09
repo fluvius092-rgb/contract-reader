@@ -85,6 +85,25 @@ export default function HomePage() {
     })
   }, [user])
 
+  // 既存サブスクで currentPeriodEnd が未設定なら一度だけ Stripe から同期
+  const [didSync, setDidSync] = useState(false)
+  useEffect(() => {
+    if (didSync) return
+    if (!user) return
+    if (userPlan !== 'sub_light' && userPlan !== 'sub_std') return
+    if (currentPeriodEnd) return
+    setDidSync(true)
+    ;(async () => {
+      try {
+        const idToken = await user.getIdToken()
+        await fetch(`${BASE_PATH}/api/stripe/sync`, {
+          method:  'POST',
+          headers: { Authorization: `Bearer ${idToken}` },
+        })
+      } catch { /* サイレント */ }
+    })()
+  }, [user, userPlan, currentPeriodEnd, didSync])
+
   // 残回数を /api/remaining から取得（都度課金チケット保持時を除く全プラン）
   const fetchRemaining = useCallback(async () => {
     try {
