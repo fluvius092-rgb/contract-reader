@@ -13,6 +13,8 @@ export async function GET() {
     hasKey:           key.length > 0,
     length:           key.length,
     startsCorrectly:  key.startsWith('sk-ant-api03-'),
+    first8:           key.substring(0, 8),
+    last4:            key.substring(key.length - 4),
     nodeEnv:          process.env.NODE_ENV,
     vercelEnv:        process.env.VERCEL_ENV ?? 'unknown',
     haikuModel:       process.env.CLAUDE_MODEL_HAIKU  ?? 'claude-haiku-4-5-20251001',
