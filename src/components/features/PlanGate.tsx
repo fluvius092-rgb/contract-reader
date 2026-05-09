@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { auth } from '@/lib/firebase'
 import { BASE_PATH } from '@/lib/basePath'
+import { isTwa, openWebVersion } from '@/lib/isTwa'
 import clsx from 'clsx'
 
 // ── 全プラン定義 ──────────────────────────────────────
@@ -154,6 +155,37 @@ export function PlanGate({ reason, onClose, existingOneTimeCredits = 0, variant 
           </button>
         </div>
         {error && <p className="text-sm text-red-500 text-center">{error}</p>}
+      </div>
+    )
+  }
+
+  // TWA（Android アプリ）からは Play Billing 必須のためアプリ内課金を提供しない
+  // Web 版に誘導する案内を表示する
+  if (isTwa()) {
+    return (
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-4">
+        <div className="text-center space-y-1">
+          <p className="text-2xl">🌐</p>
+          <h2 className="font-bold text-gray-900">プランの加入はWeb版から</h2>
+          {reason && <p className="text-xs text-gray-500">{reason}</p>}
+        </div>
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800 leading-relaxed">
+          現在ご利用のアプリではプランへの加入はできません。<br />
+          以下のボタンから Web 版を開き、同じ Google アカウントでログインしてプランを選択してください。
+          加入後はアプリでもそのままご利用いただけます。
+        </div>
+        <button
+          type="button"
+          onClick={openWebVersion}
+          className="w-full py-3 rounded-xl font-semibold text-sm bg-gray-900 text-white hover:bg-gray-700"
+        >
+          Web 版を開く →
+        </button>
+        {onClose && (
+          <button type="button" onClick={onClose} className="w-full text-sm text-gray-400 hover:text-gray-600">
+            閉じる
+          </button>
+        )}
       </div>
     )
   }
