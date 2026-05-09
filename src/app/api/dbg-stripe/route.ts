@@ -55,6 +55,32 @@ export async function GET() {
       }
     }
 
+    // 3. 実際の checkout.sessions.create を試す
+    if (subLight) {
+      try {
+        const session = await stripe.checkout.sessions.create({
+          mode:                'subscription',
+          line_items:          [{ price: subLight, quantity: 1 }],
+          success_url:         'https://settlabs.app/contract_reader/?payment=success',
+          cancel_url:          'https://settlabs.app/contract_reader/?payment=cancel',
+          client_reference_id: 'debug-test-user',
+          metadata:            { userId: 'debug-test-user', priceKey: 'subLight' },
+          subscription_data:   { metadata: { userId: 'debug-test-user', priceKey: 'subLight' } },
+        })
+        result.checkoutTest = { id: session.id, hasUrl: !!session.url }
+      } catch (e) {
+        const err = e as { name?: string; message?: string; type?: string; code?: string; statusCode?: number; raw?: unknown }
+        result.checkoutTestError = {
+          name:       err.name,
+          message:    err.message,
+          type:       err.type,
+          code:       err.code,
+          statusCode: err.statusCode,
+          raw:        err.raw,
+        }
+      }
+    }
+
     return NextResponse.json(result)
   } catch (err) {
     return NextResponse.json({ env, error: (err as Error).message })
