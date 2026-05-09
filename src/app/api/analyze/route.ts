@@ -174,8 +174,8 @@ export async function POST(req: NextRequest) {
       if (totalPages > maxPages) {
         await Promise.all(fileBuffers.map(f => bucket.file(f.ref).delete().catch(() => {})))
         return NextResponse.json(
-          { error: `ご利用プランの上限（${maxPages}ページ）を超えています。プランをアップグレードしてください。`, planRequired: true },
-          { status: 403 },
+          { error: `ページ数が多い可能性があります。分割するか、不要な部分を削除して再アップロードしてください。（上限: ${maxPages}ページ）` },
+          { status: 413 },
         )
       }
       const combined = extracted.map(e => e.text).join('\n\n')
@@ -205,8 +205,8 @@ export async function POST(req: NextRequest) {
       if (imageFiles.length > maxPages) {
         await Promise.all(fileBuffers.map(f => bucket.file(f.ref).delete().catch(() => {})))
         return NextResponse.json(
-          { error: `ご利用プランの上限（${maxPages}ページ）を超えています。プランをアップグレードしてください。`, planRequired: true },
-          { status: 403 },
+          { error: `ページ数が多い可能性があります。分割するか、不要な部分を削除して再アップロードしてください。（上限: ${maxPages}ページ）` },
+          { status: 413 },
         )
       }
       const images = imageFiles.map(f => ({
