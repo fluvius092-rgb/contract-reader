@@ -44,6 +44,16 @@ const ALL_PLANS: PlanDef[] = [
     highQuality: true,
   },
   {
+    key:         'oneTime',
+    label:       '都度払い',
+    price:       '¥200',
+    analyses:    '1回',
+    pages:       '最大20枚',
+    cta:         'checkout',
+    priceKey:    'oneTime',
+    highQuality: true,
+  },
+  {
     key:      'free',
     label:    '無料登録',
     price:    '無料',

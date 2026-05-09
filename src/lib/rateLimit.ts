@@ -44,7 +44,7 @@ interface PlanLimit {
 const PLAN_LIMITS: Record<Plan, PlanLimit> = {
   anonymous: { analyses: 1,  pages: 10, window: 'month' },
   free:      { analyses: 1,  pages: 20, window: 'month' },
-  one_time:  { analyses: 1,  pages: 60, window: 'month' },  // 1クレジット = 1回
+  one_time:  { analyses: 1,  pages: 20, window: 'month' },  // 1クレジット = 1回・最大20枚
   sub_light: { analyses: 3,  pages: 20, window: 'month' },
   sub_std:   { analyses: 5,  pages: 20, window: 'month' },
 }

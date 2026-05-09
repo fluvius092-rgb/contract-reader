@@ -111,12 +111,20 @@ export default function ContactPage() {
                   <div>
                     <h4 className="font-bold text-gray-900">Q: プランの種類を教えてください</h4>
                     <p className="mt-1">
-                      A: 以下の2プランをご用意しています。
+                      A: 以下の3プランをご用意しています。
                     </p>
                     <ul className="mt-2 space-y-1 pl-4">
+                      <li>・<strong>都度払い（¥200）</strong>: 1回だけ使いたい方向け。最大20枚まで対応。有効期限なし。</li>
                       <li>・<strong>ライトプラン（¥300/月）</strong>: 月3回まで解析可能。最大20枚/回。</li>
                       <li>・<strong>スタンダードプラン（¥500/月）</strong>: 月5回まで解析可能。最大20枚/回。</li>
                     </ul>
+                  </div>
+
+                  <div>
+                    <h4 className="font-bold text-gray-900">Q: 都度払いの有効期限はありますか？</h4>
+                    <p className="mt-1">
+                      A: 有効期限はありません。購入後、好きなタイミングでご利用いただけます。複数回購入した場合も、残った回数はそのまま繰り越されます。
+                    </p>
                   </div>
 
                   <div>
