@@ -81,7 +81,8 @@ export async function POST(req: NextRequest) {
       case 'customer.subscription.created':
       case 'customer.subscription.updated': {
         const sub     = event.data.object as Stripe.Subscription
-        const priceId = sub.items.data[0]?.price.id
+        const item    = sub.items.data[0]
+        const priceId = item?.price.id
         const userId  = await resolveUserId(sub)
         if (!userId) break
 
@@ -95,15 +96,23 @@ export async function POST(req: NextRequest) {
         }
         const status = sub.status === 'active' ? plan : 'free'
 
-        await adminDb.collection('users').doc(userId).set(
-          {
-            plan:             status,
-            stripeCustomerId: sub.customer as string,
-            stripeSubId:      sub.id,
-            updatedAt:        new Date(),
-          },
-          { merge: true },
-        )
+        // Stripe API 2026-03-25.dahlia 以降は current_period_end が items.data[0] 側に移動
+        const periodEndUnix =
+          (sub as unknown as { current_period_end?: number }).current_period_end
+          ?? (item as unknown as { current_period_end?: number } | undefined)?.current_period_end
+
+        const updates: Record<string, unknown> = {
+          plan:               status,
+          stripeCustomerId:   sub.customer as string,
+          stripeSubId:        sub.id,
+          cancelAtPeriodEnd:  !!sub.cancel_at_period_end,
+          updatedAt:          new Date(),
+        }
+        if (typeof periodEndUnix === 'number' && Number.isFinite(periodEndUnix)) {
+          updates.currentPeriodEnd = new Date(periodEndUnix * 1000)
+        }
+
+        await adminDb.collection('users').doc(userId).set(updates, { merge: true })
         break
       }
 
@@ -114,7 +123,13 @@ export async function POST(req: NextRequest) {
         if (!userId) break
 
         await adminDb.collection('users').doc(userId).set(
-          { plan: 'free', stripeSubId: null, updatedAt: new Date() },
+          {
+            plan:              'free',
+            stripeSubId:        null,
+            cancelAtPeriodEnd:  false,
+            currentPeriodEnd:   null,
+            updatedAt:          new Date(),
+          },
           { merge: true },
         )
         break

@@ -55,23 +55,33 @@ interface PendingAnalysis {
 export default function HomePage() {
   const { state, analyze, reset } = useAnalyze()
 
-  const [user, setUser]                   = useState<User | null | undefined>(undefined)
-  const [oneTimeCredits, setCredits]      = useState(0)
-  const [userPlan, setUserPlan]           = useState<'free' | 'sub_light' | 'sub_std'>('free')
-  const [analysesRemaining, setRemaining] = useState<number | null>(null)
-  const [pendingAnalysis, setPending]     = useState<PendingAnalysis | null>(null)
-  const [showPromo, setShowPromo]         = useState(false)
+  const [user, setUser]                       = useState<User | null | undefined>(undefined)
+  const [oneTimeCredits, setCredits]          = useState(0)
+  const [userPlan, setUserPlan]               = useState<'free' | 'sub_light' | 'sub_std'>('free')
+  const [analysesRemaining, setRemaining]     = useState<number | null>(null)
+  const [currentPeriodEnd, setPeriodEnd]      = useState<Date | null>(null)
+  const [cancelAtPeriodEnd, setCancelAtEnd]   = useState(false)
+  const [pendingAnalysis, setPending]         = useState<PendingAnalysis | null>(null)
+  const [showPromo, setShowPromo]             = useState(false)
 
   useEffect(() => {
     return onAuthStateChanged(auth, setUser)
   }, [])
 
   useEffect(() => {
-    if (!user) { setCredits(0); setUserPlan('free'); return }
+    if (!user) {
+      setCredits(0); setUserPlan('free'); setPeriodEnd(null); setCancelAtEnd(false)
+      return
+    }
     return onSnapshot(doc(db, 'users', user.uid), snap => {
       const data = snap.data()
       setCredits((data?.oneTimeCredits as number | undefined) ?? 0)
       setUserPlan((data?.plan as 'free' | 'sub_light' | 'sub_std' | undefined) ?? 'free')
+      setCancelAtEnd(!!data?.cancelAtPeriodEnd)
+      const end = data?.currentPeriodEnd
+      if (end && typeof end.toDate === 'function') setPeriodEnd(end.toDate())
+      else if (end instanceof Date) setPeriodEnd(end)
+      else setPeriodEnd(null)
     })
   }, [user])
 
@@ -203,6 +213,11 @@ export default function HomePage() {
                         <div className="min-w-0">
                           <p className="text-xs font-semibold text-gray-800">
                             {userPlan === 'sub_std' ? 'スタンダードプラン' : 'ライトプラン'}
+                            {cancelAtPeriodEnd && (
+                              <span className="ml-1.5 text-[10px] bg-rose-500 text-white px-1.5 py-0.5 rounded-full font-normal">
+                                解約予約中
+                              </span>
+                            )}
                           </p>
                           <p className="text-xs text-gray-500 mt-0.5">
                             {analysesRemaining !== null
@@ -210,6 +225,11 @@ export default function HomePage() {
                               : userPlan === 'sub_std' ? '月5回・最大20枚まで' : '月3回・最大20枚まで'
                             }
                           </p>
+                          {currentPeriodEnd && (
+                            <p className="text-[10px] text-gray-400 mt-0.5">
+                              {cancelAtPeriodEnd ? '解約予定日' : '次回更新日'}: {currentPeriodEnd.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}
+                            </p>
+                          )}
                         </div>
                       </div>
                     ) : oneTimeCredits > 0 ? (
