@@ -179,7 +179,13 @@ export function PlanGate({ reason, onClose, existingOneTimeCredits = 0, variant 
 
       {/* 比較カード（縦リスト） */}
       <div className="space-y-2">
-        {ALL_PLANS.map(plan => {
+        {ALL_PLANS.filter(plan => {
+          // ログイン済み（free/sub_*）なら未登録パネルは非表示
+          if (plan.key === 'anonymous' && currentPlan !== 'anonymous') return false
+          // 有料プラン契約中なら無料登録パネルも非表示（既にログイン済み）
+          if (plan.key === 'free' && (currentPlan === 'subLight' || currentPlan === 'subStd')) return false
+          return true
+        }).map(plan => {
           const isCurrent = plan.key === currentPlan
           const isPaid    = plan.cta === 'checkout'
           const isRec     = !!plan.badge
