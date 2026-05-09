@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { onAuthStateChanged, type User } from 'firebase/auth'
 import { doc, onSnapshot } from 'firebase/firestore'
 import { auth, db } from '@/lib/firebase'
+import { BASE_PATH } from '@/lib/basePath'
 import { PlanGate } from './PlanGate'
 
 type Plan = 'free' | 'sub_light' | 'sub_std'
@@ -44,8 +45,7 @@ export function ManageSubscription() {
     setPortalError(null)
     try {
       const idToken = await auth.currentUser?.getIdToken()
-      const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
-      const res = await fetch(`${basePath}/api/stripe/portal`, {
+      const res = await fetch(`${BASE_PATH}/api/stripe/portal`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${idToken}` },
       })

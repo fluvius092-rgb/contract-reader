@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { auth } from '@/lib/firebase'
+import { BASE_PATH } from '@/lib/basePath'
 import clsx from 'clsx'
 
 // ── 全プラン定義 ──────────────────────────────────────
@@ -84,8 +85,7 @@ export function PlanGate({ reason, onClose, existingOneTimeCredits = 0, variant 
         setLoading(null)
         return
       }
-      const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
-      const res = await fetch(`${basePath}/api/stripe/checkout`, {
+      const res = await fetch(`${BASE_PATH}/api/stripe/checkout`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
         body:    JSON.stringify({ priceKey }),
@@ -105,8 +105,7 @@ export function PlanGate({ reason, onClose, existingOneTimeCredits = 0, variant 
   const handleCta = (plan: PlanDef) => {
     if (!plan.cta) return
     if (plan.cta === 'register') {
-      const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
-      router.push(`${basePath}/auth`)
+      router.push('/auth')
       return
     }
     if (plan.priceKey === 'oneTime' && existingOneTimeCredits > 0) {

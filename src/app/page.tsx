@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { onAuthStateChanged, type User } from 'firebase/auth'
 import { doc, onSnapshot } from 'firebase/firestore'
 import { auth, db } from '@/lib/firebase'
+import { BASE_PATH } from '@/lib/basePath'
 import { useAnalyze } from '@/lib/hooks/useAnalyze'
 import { UploadZone } from '@/components/features/UploadZone'
 import { AnalysisResultView } from '@/components/features/AnalysisResult'
@@ -77,10 +78,9 @@ export default function HomePage() {
   // 残回数を /api/remaining から取得（未ログイン・無料プランのみ）
   const fetchRemaining = useCallback(async () => {
     try {
-      const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
       const idToken  = await auth.currentUser?.getIdToken() ?? null
       const headers: Record<string, string> = idToken ? { Authorization: `Bearer ${idToken}` } : {}
-      const res  = await fetch(`${basePath}/api/remaining`, { headers, cache: 'no-store' })
+      const res  = await fetch(`${BASE_PATH}/api/remaining`, { headers, cache: 'no-store' })
       if (!res.ok) return
       const { remaining } = await res.json() as { remaining: number }
       setRemaining(remaining)

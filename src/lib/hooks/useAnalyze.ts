@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { auth } from '@/lib/firebase'
+import { BASE_PATH } from '@/lib/basePath'
 import type { CategoryId, AnalysisResult, UploadState } from '@/types'
 
 export function useAnalyze() {
@@ -31,8 +32,7 @@ export function useAnalyze() {
           formData.append('files', file)
         }
 
-        const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
-        const uploadRes = await fetch(`${basePath}/api/upload`, {
+        const uploadRes = await fetch(`${BASE_PATH}/api/upload`, {
           method:  'POST',
           headers: authHeaders,
           body:    formData,
@@ -51,7 +51,7 @@ export function useAnalyze() {
         // ── Step 2: AI 解析 ──────────────────────────
         setState(s => ({ ...s, status: 'analyzing' }))
 
-        const analyzeRes = await fetch(`${basePath}/api/analyze`, {
+        const analyzeRes = await fetch(`${BASE_PATH}/api/analyze`, {
           method:  'POST',
           headers: { 'Content-Type': 'application/json', ...authHeaders },
           body:    JSON.stringify({ category, files: uploaded, userQuestion }),
