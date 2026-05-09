@@ -174,6 +174,8 @@ export default function HomePage() {
                 <UploadZone
                   onSubmit={handleAnalyze}
                   isLoading={false}
+                  remainingAnalyses={analysesRemaining}
+                  oneTimeCredits={oneTimeCredits}
                   planBadge={
                     isFreeTier ? (
                       <div className="flex items-center justify-between gap-3 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl border border-indigo-100 px-3 py-2.5">

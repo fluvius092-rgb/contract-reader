@@ -10,6 +10,8 @@ interface Props {
   onSubmit: (files: File[], category: CategoryId, question?: string) => void
   isLoading: boolean
   planBadge?: React.ReactNode
+  remainingAnalyses?: number | null
+  oneTimeCredits?: number
 }
 
 const ACCEPTED_TYPES = {
@@ -25,7 +27,7 @@ const ACCEPTED_TYPES = {
 const MAX_FILES      = 20
 const MAX_FILE_BYTES = 20 * 1024 * 1024  // 20MB
 
-export function UploadZone({ onSubmit, isLoading, planBadge }: Props) {
+export function UploadZone({ onSubmit, isLoading, planBadge, remainingAnalyses, oneTimeCredits }: Props) {
   const [files, setFiles]       = useState<File[]>([])
   const [category, setCategory] = useState<CategoryId | null>(null)
   const [question, setQuestion] = useState('')
@@ -266,11 +268,18 @@ export function UploadZone({ onSubmit, isLoading, planBadge }: Props) {
             : 'bg-gray-100 text-gray-400 cursor-not-allowed',
         )}
       >
-        {isLoading
-          ? '解析中...'
-          : files.length > 1
-            ? `${files.length}枚の書類を読み解く`
-            : '契約書を読み解く'}
+        {isLoading ? (
+          '解析中...'
+        ) : (
+          <>
+            {files.length > 1 ? `${files.length}枚の書類を読み解く` : '契約書を読み解く'}
+            {oneTimeCredits && oneTimeCredits > 0 ? (
+              <span className="ml-1.5 text-xs font-normal opacity-80">（チケット残 {oneTimeCredits} 回）</span>
+            ) : typeof remainingAnalyses === 'number' ? (
+              <span className="ml-1.5 text-xs font-normal opacity-80">（あと {remainingAnalyses} 回）</span>
+            ) : null}
+          </>
+        )}
       </button>
     </div>
   )
