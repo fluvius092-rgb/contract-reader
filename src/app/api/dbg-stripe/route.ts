@@ -29,12 +29,12 @@ export async function GET() {
 
     const result: Record<string, unknown> = { env }
 
-    // 1. アカウント取得（疎通確認）
+    // 1. balance.retrieve で疎通確認
     try {
-      const acct = await stripe.accounts.retrieve()
-      result.account = { id: acct.id, country: acct.country, chargesEnabled: acct.charges_enabled, detailsSubmitted: acct.details_submitted }
+      const bal = await stripe.balance.retrieve()
+      result.balance = { available: bal.available.length, livemode: bal.livemode }
     } catch (e) {
-      result.accountError = (e as Error).message
+      result.balanceError = (e as Error).message
     }
 
     // 2. 各 priceId が有効か検証
