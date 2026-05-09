@@ -58,7 +58,7 @@ const ALL_PLANS: PlanDef[] = [
     key:      'free',
     label:    '無料登録',
     price:    '無料',
-    analyses: '月1回',
+    analyses: 'お試し1回（更新なし）',
     pages:    '最大20枚',
     cta:      'register',
   },
@@ -66,7 +66,7 @@ const ALL_PLANS: PlanDef[] = [
     key:      'anonymous',
     label:    '未登録',
     price:    '無料',
-    analyses: '月1回',
+    analyses: 'お試し1回（更新なし）',
     pages:    '最大10枚',
   },
 ]
