@@ -66,7 +66,7 @@ interface Props {
   onClose?: () => void
   existingOneTimeCredits?: number
   variant?: 'limit' | 'promo'
-  currentPlan?: 'anonymous' | 'free'
+  currentPlan?: PlanKey
 }
 
 export function PlanGate({ reason, onClose, existingOneTimeCredits = 0, variant = 'limit', currentPlan = 'anonymous' }: Props) {

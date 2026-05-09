@@ -101,6 +101,13 @@ export default function HomePage() {
   const isFreeTier = user !== undefined
     && (user === null || (userPlan === 'free' && oneTimeCredits === 0))
 
+  // PlanGate の currentPlan に渡す現プラン（PlanKey 形式）
+  const currentPlanKey: 'anonymous' | 'free' | 'subLight' | 'subStd' =
+    !user ? 'anonymous' :
+    userPlan === 'sub_std'   ? 'subStd' :
+    userPlan === 'sub_light' ? 'subLight' :
+    'free'
+
   const handleAnalyze = useCallback(
     (files: File[], category: CategoryId, question?: string) => {
       if (oneTimeCredits > 0) {
@@ -159,7 +166,7 @@ export default function HomePage() {
               <PlanGate
                 variant="limit"
                 reason={user ? '今月の無料利用枠を使い切りました' : '今月の利用枠を使い切りました'}
-                currentPlan={user ? 'free' : 'anonymous'}
+                currentPlan={currentPlanKey}
                 existingOneTimeCredits={oneTimeCredits}
               />
             ) : (
@@ -338,7 +345,7 @@ export default function HomePage() {
                 reason={state.error ?? undefined}
                 onClose={reset}
                 existingOneTimeCredits={oneTimeCredits}
-                currentPlan={user ? 'free' : 'anonymous'}
+                currentPlan={currentPlanKey}
               />
             ) : state.serviceUnavailable ? (
               <>
@@ -409,7 +416,7 @@ export default function HomePage() {
           <div className="w-full max-w-sm">
             <PlanGate
               variant="promo"
-              currentPlan={user ? 'free' : 'anonymous'}
+              currentPlan={currentPlanKey}
               onClose={() => setShowPromo(false)}
               existingOneTimeCredits={oneTimeCredits}
             />
