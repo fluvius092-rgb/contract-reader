@@ -75,7 +75,7 @@ export default function HomePage() {
     })
   }, [user])
 
-  // 残回数を /api/remaining から取得（未ログイン・無料プランのみ）
+  // 残回数を /api/remaining から取得（都度課金チケット保持時を除く全プラン）
   const fetchRemaining = useCallback(async () => {
     try {
       const idToken  = await auth.currentUser?.getIdToken() ?? null
@@ -90,7 +90,6 @@ export default function HomePage() {
   useEffect(() => {
     if (user === undefined) return          // 認証状態確定待ち
     if (oneTimeCredits > 0) { setRemaining(null); return }
-    if (userPlan !== 'free' && user !== null) { setRemaining(null); return }
     fetchRemaining()
   }, [user, userPlan, oneTimeCredits, fetchRemaining])
 
@@ -168,28 +167,53 @@ export default function HomePage() {
                 <UploadZone
                   onSubmit={handleAnalyze}
                   isLoading={false}
-                  planBadge={isFreeTier ? (
-                    <div className="flex items-center justify-between gap-3 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl border border-indigo-100 px-3 py-2.5">
-                      <div className="min-w-0">
-                        <p className="text-xs font-semibold text-gray-800">
-                          {user ? '無料プランをご利用中' : '無料でお試し中'}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-0.5">
-                          {analysesRemaining !== null
-                            ? `今月あと ${analysesRemaining} 回 / 最大${user ? 20 : 10}枚まで`
-                            : user ? '月1回・最大20枚まで' : '月1回・最大10枚まで'
-                          }
-                        </p>
+                  planBadge={
+                    isFreeTier ? (
+                      <div className="flex items-center justify-between gap-3 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl border border-indigo-100 px-3 py-2.5">
+                        <div className="min-w-0">
+                          <p className="text-xs font-semibold text-gray-800">
+                            {user ? '無料プランをご利用中' : '無料でお試し中'}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            {analysesRemaining !== null
+                              ? `今月あと ${analysesRemaining} 回 / 最大${user ? 20 : 10}枚まで`
+                              : user ? '月1回・最大20枚まで' : '月1回・最大10枚まで'
+                            }
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setShowPromo(true)}
+                          className="shrink-0 text-xs font-semibold text-indigo-600 hover:text-indigo-800 whitespace-nowrap"
+                        >
+                          プランを見る →
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => setShowPromo(true)}
-                        className="shrink-0 text-xs font-semibold text-indigo-600 hover:text-indigo-800 whitespace-nowrap"
-                      >
-                        プランを見る →
-                      </button>
-                    </div>
-                  ) : undefined}
+                    ) : (userPlan === 'sub_light' || userPlan === 'sub_std') ? (
+                      <div className="flex items-center gap-3 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-100 px-3 py-2.5">
+                        <div className="min-w-0">
+                          <p className="text-xs font-semibold text-gray-800">
+                            {userPlan === 'sub_std' ? 'スタンダードプラン' : 'ライトプラン'}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            {analysesRemaining !== null
+                              ? `今月あと ${analysesRemaining} 回 / 最大20枚まで`
+                              : userPlan === 'sub_std' ? '月5回・最大20枚まで' : '月3回・最大20枚まで'
+                            }
+                          </p>
+                        </div>
+                      </div>
+                    ) : oneTimeCredits > 0 ? (
+                      <div className="flex items-center gap-3 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-100 px-3 py-2.5">
+                        <div className="min-w-0">
+                          <p className="text-xs font-semibold text-gray-800">都度課金チケット</p>
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            残り {oneTimeCredits} 回 / 最大60枚まで
+                          </p>
+                        </div>
+                      </div>
+                    ) : undefined
+                  }
                 />
               </div>
             )}
