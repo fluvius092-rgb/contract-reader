@@ -97,11 +97,10 @@ export async function POST(req: NextRequest) {
 
         await adminDb.collection('users').doc(userId).set(
           {
-            plan:                status,
-            stripeCustomerId:    sub.customer as string,
-            stripeSubId:         sub.id,
-            subCurrentPeriodEnd: new Date((sub as unknown as { current_period_end: number }).current_period_end * 1000),
-            updatedAt:           new Date(),
+            plan:             status,
+            stripeCustomerId: sub.customer as string,
+            stripeSubId:      sub.id,
+            updatedAt:        new Date(),
           },
           { merge: true },
         )
@@ -131,15 +130,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true })
   } catch (err) {
     logError('webhook/handler', err)
-    const e = err as { name?: string; message?: string; stack?: string }
-    return NextResponse.json({
-      error: 'Handler error',
-      eventType: event.type,
-      _debug: {
-        name:    e.name,
-        message: e.message,
-        stack:   e.stack?.split('\n').slice(0, 6).join('\n'),
-      },
-    }, { status: 500 })
+    return NextResponse.json({ error: 'Handler error' }, { status: 500 })
   }
 }
