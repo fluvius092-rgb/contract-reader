@@ -131,6 +131,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true })
   } catch (err) {
     logError('webhook/handler', err)
-    return NextResponse.json({ error: 'Handler error' }, { status: 500 })
+    const e = err as { name?: string; message?: string; stack?: string }
+    return NextResponse.json({
+      error: 'Handler error',
+      eventType: event.type,
+      _debug: {
+        name:    e.name,
+        message: e.message,
+        stack:   e.stack?.split('\n').slice(0, 6).join('\n'),
+      },
+    }, { status: 500 })
   }
 }
