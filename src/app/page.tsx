@@ -8,6 +8,7 @@ import { onAuthStateChanged, type User } from 'firebase/auth'
 import { doc, onSnapshot } from 'firebase/firestore'
 import { auth, db } from '@/lib/firebase'
 import { BASE_PATH } from '@/lib/basePath'
+import { isTwa, openWebVersion } from '@/lib/isTwa'
 import { useAnalyze } from '@/lib/hooks/useAnalyze'
 import { UploadZone } from '@/components/features/UploadZone'
 import { AnalysisResultView } from '@/components/features/AnalysisResult'
@@ -63,6 +64,9 @@ export default function HomePage() {
   const [cancelAtPeriodEnd, setCancelAtEnd]   = useState(false)
   const [pendingAnalysis, setPending]         = useState<PendingAnalysis | null>(null)
   const [showPromo, setShowPromo]             = useState(false)
+  const [twaMode, setTwaMode]                 = useState(false)
+
+  useEffect(() => { setTwaMode(isTwa()) }, [])
 
   useEffect(() => {
     return onAuthStateChanged(auth, setUser)
@@ -211,7 +215,23 @@ export default function HomePage() {
                   remainingAnalyses={analysesRemaining}
                   oneTimeCredits={oneTimeCredits}
                   planBadge={
-                    isFreeTier ? (
+                    twaMode ? (
+                      <div className="flex items-center justify-between gap-3 bg-gradient-to-r from-sky-50 to-cyan-50 rounded-xl border border-sky-200 px-3 py-2.5">
+                        <div className="min-w-0">
+                          <p className="text-xs font-semibold text-gray-800">アプリでお試し中</p>
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            続けて使うには Web 版をご利用ください
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={openWebVersion}
+                          className="shrink-0 text-xs font-semibold text-sky-700 hover:text-sky-900 whitespace-nowrap"
+                        >
+                          Web 版へ →
+                        </button>
+                      </div>
+                    ) : isFreeTier ? (
                       <div className="flex items-center justify-between gap-3 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl border border-indigo-100 px-3 py-2.5">
                         <div className="min-w-0">
                           <p className="text-xs font-semibold text-gray-800">
