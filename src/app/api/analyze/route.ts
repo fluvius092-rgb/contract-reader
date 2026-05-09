@@ -11,6 +11,8 @@ import { logError } from '@/lib/logSafe'
 import { AnalysisResultSchema } from '@/lib/analysisSchema'
 import type { CategoryId, AnalysisResult } from '@/types'
 
+export const maxDuration = 60
+
 const CLAUDE_MODEL_HAIKU  = process.env.CLAUDE_MODEL_HAIKU  ?? 'claude-haiku-4-5-20251001'
 const CLAUDE_MODEL_SONNET = process.env.CLAUDE_MODEL_SONNET ?? 'claude-sonnet-4-6'
 const MAX_IMAGES_PER_CALL = 20  // Claude API の1回あたり上限

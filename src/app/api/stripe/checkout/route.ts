@@ -10,7 +10,7 @@ import { verifyIdToken, adminDb } from '@/lib/firebase-admin'
 import { logError } from '@/lib/logSafe'
 
 const RequestSchema = z.object({
-  priceKey: z.enum(['oneTime', 'subLight', 'subStd']),
+  priceKey: z.enum(['subLight', 'subStd']),
 })
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://settlabs.app/contract_reader'

@@ -6,6 +6,8 @@ import { adminStorage, verifyIdToken } from '@/lib/firebase-admin'
 import { randomUUID } from 'crypto'
 import { logError } from '@/lib/logSafe'
 
+export const maxDuration = 30
+
 const ALLOWED_MIME_TYPES = [
   'application/pdf',
   'image/jpeg',
