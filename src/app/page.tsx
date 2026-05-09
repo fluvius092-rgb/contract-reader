@@ -341,7 +341,7 @@ export default function HomePage() {
               <ul className="space-y-2 text-sm text-gray-700">
                 <li className="flex items-start gap-2">
                   <span className="text-green-500 mt-0.5">✓</span>
-                  <span><strong>完全無料</strong> — 登録なしですぐに使えます</span>
+                  <span><strong>無料でお試し可能</strong> — 登録なしで1回、登録後にもう1回試せます</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-green-500 mt-0.5">✓</span>
@@ -368,7 +368,7 @@ export default function HomePage() {
               <div className="space-y-3 text-sm">
                 <div>
                   <p className="font-semibold text-gray-800">Q. 本当に無料ですか？</p>
-                  <p className="text-gray-600 mt-0.5">基本利用は無料です。会員登録なしで月1回（最大10枚）お試しいただけます。より多くご利用になりたい方には、月額¥300〜の有料プランもご用意しています。</p>
+                  <p className="text-gray-600 mt-0.5">会員登録なしで1回（最大10枚）、登録後にもう1回（最大20枚）、合計2回まで無料でお試しいただけます。続けてご利用になりたい方には、都度払い¥200や月額¥300〜の有料プランもご用意しています。</p>
                 </div>
                 <div>
                   <p className="font-semibold text-gray-800">Q. アップロードした契約書は安全ですか？</p>
